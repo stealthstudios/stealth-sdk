@@ -1,0 +1,34 @@
+name: TypeScript CI
+on:
+    push:
+        branches:
+            - "**" # all branches
+
+env:
+    CI: true
+
+jobs:
+    eslint:
+        name: ESLint
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+            - name: Install
+              run: npm install
+            - name: ESLint
+              run: npm run lint
+    prettier:
+        name: Prettier
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "22"
+            - name: Install
+              run: npm install
+            - name: Prettier
+              run: npm run ci:prettier

@@ -1,0 +1,11 @@
+# Node
+node_modules
+
+# Env
+.env
+
+# Logs
+logs
+
+# Data
+data
