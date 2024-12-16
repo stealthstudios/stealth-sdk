@@ -15,7 +15,7 @@ function engine.new(config: EngineConfig): Engine
 end
 
 function engine.start(self: Engine)
-	local tagged = game:GetTagged(constants.NPC_TAG)
+	local tagged = workspace:GetTagged(constants.NPC_TAG)
 
 	for _, npc in tagged do
 		local character = npc:GetAttribute(constants.NPC_CHARACTER_ATTRIBUTE)
