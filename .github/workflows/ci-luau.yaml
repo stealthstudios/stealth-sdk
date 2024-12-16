@@ -1,4 +1,4 @@
-name: CI
+name: CI Luau
 on:
   push:
     branches:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: sdk/luau
+        working-directory: ./sdk/luau
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: sdk/luau
+        working-directory: ./sdk/luau
     steps:
       - name: Checkout
         uses: actions/checkout@v3
