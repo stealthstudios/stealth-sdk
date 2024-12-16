@@ -16,11 +16,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Install
-        run: npm install
-        working-directory: ./backend
-      - name: ESLint
-        run: npm run ci:lint
+      - name: Lint
+        run: |
+          npm install
+          npm run ci:lint
         working-directory: ./backend
   prettier:
     name: Prettier
@@ -31,8 +30,7 @@ jobs:
         with:
           node-version: "22"
       - name: Install
-        run: npm install
-        working-directory: ./backend
-      - name: Prettier
-        run: npm run ci:prettier
+        run: |
+          npm install
+          npm run ci:prettier
         working-directory: ./backend
