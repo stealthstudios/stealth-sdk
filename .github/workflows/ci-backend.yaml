@@ -19,6 +19,7 @@ jobs:
       - name: Lint
         run: |
           npm install
+          echo "$PWD"
           npm run ci:lint
         working-directory: ./backend
   prettier:
