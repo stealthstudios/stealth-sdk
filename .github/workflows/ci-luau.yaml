@@ -1,0 +1,39 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+      - main
+  pull_request:
+    branches:
+      - master
+      - main
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdk/luau
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: CompeyDev/setup-rokit@v0.1.2
+        name: Install Rokit
+      - name: Lint
+        run: selene ./src
+  style:
+    name: Style
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sdk/luau
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: JohnnyMorganz/stylua-action@v2
+        with:
+          version: latest
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --check ./src

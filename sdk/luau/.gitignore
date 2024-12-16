@@ -1,0 +1,24 @@
+# Project place file
+/build.rbxl
+/build.rbxm
+
+# Roblox Studio lock files
+/*.rbxlx.lock
+/*.rbxl.lock
+
+# Wally files
+/[Pp]ackages
+/[Ss]erverPackages
+
+# DarkLua builds
+/dist
+/temp
+
+# Zap output
+/.zap
+
+# sourcemap
+sourcemap.json
+
+# Environment
+env.luau

@@ -1,0 +1,30 @@
+{
+	"name": "chatbot-engine",
+	"tree": {
+		"$className": "DataModel",
+		"Workspace": {
+			"$ignoreUnknownInstances": true,
+			"$path": "dist/demo/workspace"
+		},
+		"ServerScriptService": {
+			"$ignoreUnknownInstances": true,
+			"$path": "dist/demo/server"
+		},
+		"StarterPlayer": {
+			"$ignoreUnknownInstances": true,
+			"StarterPlayerScripts": {
+				"$ignoreUnknownInstances": true,
+				"$path": "dist/demo/client"
+			}
+		},
+		"ReplicatedStorage": {
+			"Packages": {
+				"$className": "Folder",
+				"chatbot-engine": {
+					"$path": "dist/src"
+				},
+				"$path": "./packages"
+			}
+		}
+	}
+}

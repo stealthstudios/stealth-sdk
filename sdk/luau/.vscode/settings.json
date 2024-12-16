@@ -1,0 +1,14 @@
+{
+    "luau-lsp.ignoreGlobs": [
+        ".lune/**",
+        "dist/**",
+        "[Pp]ackages/**"
+    ],
+    "[lua]": {
+        "editor.defaultFormatter": "JohnnyMorganz.stylua",
+        "editor.formatOnSave": true
+    },
+    "luau-lsp.types.definitionFiles": [
+        ".vscode/type_definitions.d.luau"
+    ]
+}

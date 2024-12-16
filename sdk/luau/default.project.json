@@ -1,0 +1,6 @@
+{
+    "name": "chatbot-engine",
+    "tree": {
+        "$path": "dist"
+    }
+}

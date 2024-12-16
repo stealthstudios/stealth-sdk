@@ -1,0 +1,14 @@
+{
+	"aliases": {
+		"src": "./src",
+		"api": "./src/api",
+		"packages": "./packages",
+		"serverpackages": "./serverPackages"
+	},
+	"languageMode": "strict",
+	"lintErrors": false,
+	"typeErrors": true,
+	"lint": {
+		"*": true
+	}
+}

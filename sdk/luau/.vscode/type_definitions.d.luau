@@ -1,0 +1,1 @@
+declare __DEV__: boolean

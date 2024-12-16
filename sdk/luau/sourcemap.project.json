@@ -1,0 +1,10 @@
+{
+	"name": "chatbot-engine",
+	"tree": {
+		"$className": "Folder",
+		"chatbot-engine": {
+			"$path": "temp"
+		},
+		"$path": "./packages"
+	}
+}
