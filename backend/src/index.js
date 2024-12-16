@@ -13,11 +13,17 @@ async function main() {
         (envVar) => !process.env[envVar],
     );
 
+    let a = ""
+
     if (missingEnvVars.length > 0) {
         logger.error(
             `Missing environment variables: ${missingEnvVars.join(", ")}`,
         );
         process.exit(1);
+    }
+
+    if (process.env.ENVIRONMENT == "development") {
+        logger.warn("Running in development mode - API keys are exposed!");
     }
 
     const __filename = fileURLToPath(import.meta.url);
