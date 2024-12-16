@@ -19,7 +19,7 @@ jobs:
       - name: Lint
         run: |
           npm install
-          npm run ci:lint
+          npm run lint
         working-directory: ./backend
   prettier:
     name: Prettier
@@ -32,5 +32,5 @@ jobs:
       - name: Install
         run: |
           npm install
-          npm run ci:prettier
+          npm run ci:format
         working-directory: ./backend

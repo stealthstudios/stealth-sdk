@@ -14,8 +14,7 @@
         "dev": "nodemon index.js --watch src",
         "lint": "eslint \"./src/**/*.js\" --config ./eslint.config.mjs",
         "format": "prettier --write \"./src/**/*.js\"",
-        "ci:lint": "eslint \"./src/**/*.js\" --config ./eslint.config.mjs",
-        "ci:prettier": "prettier --check \"./src/**/*.js\""
+        "ci:format": "prettier --check \"./src/**/*.js\""
     },
     "author": "",
     "license": "ISC",

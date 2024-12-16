@@ -13,8 +13,6 @@ async function main() {
         (envVar) => !process.env[envVar],
     );
 
-    let a = ""; 
-
     if (missingEnvVars.length > 0) {
         logger.error(
             `Missing environment variables: ${missingEnvVars.join(", ")}`,
