@@ -13,7 +13,7 @@ async function main() {
         (envVar) => !process.env[envVar],
     );
 
-    let a = ""
+    let a = "";
 
     if (missingEnvVars.length > 0) {
         logger.error(

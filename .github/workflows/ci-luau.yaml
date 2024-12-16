@@ -13,16 +13,16 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./sdk/luau
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - uses: CompeyDev/setup-rokit@v0.1.2
-        name: Install Rokit
+        name: Install rokit
+        with:
+          path: ./sdk/luau
       - name: Lint
         run: selene ./src
+        working-directory: ./sdk/luau
   style:
     name: Style
     runs-on: ubuntu-latest
@@ -36,4 +36,4 @@ jobs:
         with:
           version: latest
           token: ${{ secrets.GITHUB_TOKEN }}
-          args: --check ./src
+          args: --check ./sdk/luau
