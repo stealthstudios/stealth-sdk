@@ -7,18 +7,22 @@ import { fileURLToPath } from "url";
 
 const REQUIRED_ENV_VARS = [
     "SERVER_PORT",
-    "OPENAI_API_KEY", 
+    "OPENAI_API_KEY",
     "ENDPOINT_API_KEY",
     "POSTGRES_USER",
     "POSTGRES_PASSWORD",
-    "POSTGRES_DB"
+    "POSTGRES_DB",
 ];
 
 async function startServer() {
     // Validate environment variables
-    const missingEnvVars = REQUIRED_ENV_VARS.filter(envVar => !process.env[envVar]);
+    const missingEnvVars = REQUIRED_ENV_VARS.filter(
+        (envVar) => !process.env[envVar],
+    );
     if (missingEnvVars.length > 0) {
-        logger.error(`Missing environment variables: ${missingEnvVars.join(", ")}`);
+        logger.error(
+            `Missing environment variables: ${missingEnvVars.join(", ")}`,
+        );
         process.exit(1);
     }
 
@@ -28,12 +32,12 @@ async function startServer() {
 
     // Set up file paths
     const __dirname = dirname(fileURLToPath(import.meta.url));
-    
+
     // Configure server
     server.register(fastifyAutoload, {
         dir: join(__dirname, "routes"),
         autoHooks: true,
-        cascadeHooks: true
+        cascadeHooks: true,
     });
 
     // Start server

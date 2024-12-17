@@ -15,16 +15,16 @@ const swaggerConfig = {
         info: {
             title: "Chatbot AI Engine",
             description: "API documentation for the Chatbot AI Engine",
-            version: "1.0.0"
+            version: "1.0.0",
         },
         tags: [
             {
                 name: "conversation",
-                description: "Conversation related endpoints"
+                description: "Conversation related endpoints",
             },
-            { 
-                name: "debug" 
-            }
+            {
+                name: "debug",
+            },
         ],
         components: {
             securitySchemes: {
@@ -32,11 +32,11 @@ const swaggerConfig = {
                     type: "apiKey",
                     in: "header",
                     name: "Authorization",
-                    description: "Endpoint API key"
-                }
-            }
-        }
-    }
+                    description: "Endpoint API key",
+                },
+            },
+        },
+    },
 };
 
 server.register(swagger, swaggerConfig);
@@ -49,12 +49,13 @@ const apiReferenceConfig = {
         authentication: {
             preferredSecurityScheme: "endpointAuth",
             apiKey: {
-                token: process.env.ENVIRONMENT === "development" 
-                    ? process.env.ENDPOINT_API_KEY 
-                    : null
-            }
-        }
-    }
+                token:
+                    process.env.ENVIRONMENT === "development"
+                        ? process.env.ENDPOINT_API_KEY
+                        : null,
+            },
+        },
+    },
 };
 
 server.register(apiReference, apiReferenceConfig);

@@ -120,7 +120,7 @@ export default class Conversation {
             const { messages, response } = await this.processMessage(
                 message,
                 context,
-                playerId
+                playerId,
             );
 
             await this.saveMessages(messages, context);
@@ -152,7 +152,7 @@ export default class Conversation {
         const fullRecord = await this.getConversationRecord();
         const { usedMessages, tokenCount } = this.prepareMessageHistory(
             fullRecord.messages,
-            encoding
+            encoding,
         );
 
         const totalTokens =
@@ -163,12 +163,12 @@ export default class Conversation {
         const contextMessage = this.buildContextMessage(
             context,
             fullRecord.users,
-            playerId
+            playerId,
         );
 
         usedMessages.push(
             { role: "system", content: contextMessage },
-            { role: "user", content: message }
+            { role: "user", content: message },
         );
 
         const response = await this.getAIResponse(
@@ -176,7 +176,7 @@ export default class Conversation {
             message,
             fullRecord.users,
             playerId,
-            totalTokens
+            totalTokens,
         );
 
         return {
@@ -239,7 +239,8 @@ export default class Conversation {
             ...context,
             {
                 key: "users",
-                description: "The users participating in the conversation, separated by commas.",
+                description:
+                    "The users participating in the conversation, separated by commas.",
                 value: users.map((p) => p.name).join(", "),
             },
             {
@@ -267,11 +268,14 @@ export default class Conversation {
         const response = rawResponse.choices[0].message;
         if (!response) throw new Error("No response from OpenAI");
 
-        const moderationResult = await this.moderateContent(userMessage, response.content);
+        const moderationResult = await this.moderateContent(
+            userMessage,
+            response.content,
+        );
 
         const username = users.find((p) => p.id === playerId).name;
         logger.debug(
-            `${username} (${playerId}) sent a message to conversation ${this.id} (total tokens: ${tokenCount})`
+            `${username} (${playerId}) sent a message to conversation ${this.id} (total tokens: ${tokenCount})`,
         );
 
         return {
@@ -297,7 +301,7 @@ export default class Conversation {
 
         if (moderationResponse.flagged) {
             logger.warn(
-                `Message by user ${userMessage.sender} flagged by moderation (${moderationResponse.categories}). The message was ${userMessage.content} and the response was ${responseContent}`
+                `Message by user ${userMessage.sender} flagged by moderation (${moderationResponse.categories}). The message was ${userMessage.content} and the response was ${responseContent}`,
             );
             return { flagged: true };
         }
