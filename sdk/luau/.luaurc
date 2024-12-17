@@ -1,11 +1,12 @@
 {
 	"aliases": {
 		"src": "./src",
-		"api": "./src/api",
+		"server": "./src/server",
+		"client": "./src/client",
 		"packages": "./packages",
 		"serverpackages": "./serverPackages"
 	},
-	"languageMode": "strict",
+	"languageMode": "nonstrict",
 	"lintErrors": false,
 	"typeErrors": true,
 	"lint": {

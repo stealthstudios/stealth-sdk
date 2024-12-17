@@ -3,7 +3,7 @@
 	"tree": {
 		"$className": "Folder",
 		"chatbot-engine": {
-			"$path": "temp"
+			"$path": "temp/src"
 		},
 		"$path": "./packages"
 	}

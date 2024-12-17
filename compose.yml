@@ -1,0 +1,39 @@
+services:
+
+  db:
+    container_name: db
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    volumes:
+      - ./backend/data/db:/var/lib/postgresql/data
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3307:5432"
+
+  pgadmin:
+    depends_on:
+      - db
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    restart: always
+    ports:
+      - "8080:80"
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./pgadmin-data:/var/lib/pgadmin
+
+  app:
+    depends_on:
+      - db
+    container_name: app
+    image: node:20
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend/logs/:/app/logs/
+    working_dir: /app

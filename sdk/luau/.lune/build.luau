@@ -1,7 +1,7 @@
 local fs = require("@lune/fs")
 
-local logger = require("./lib/logger").new(4)
 local executeCommand = require("./lib/executeCommand")
+local logger = require("./lib/logger").new(4)
 
 local didError = false
 
@@ -44,8 +44,6 @@ execCommandWrapper("rojo", { "sourcemap", "sourcemap.project.json", "-o", "sourc
 if hasDarkLua then
 	execCommandWrapper("darklua", { "process", "temp", "temp" })
 end
-
--- Optional processing steps here
 
 recursiveCopy("temp", "dist")
 

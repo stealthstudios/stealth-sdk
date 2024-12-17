@@ -12,8 +12,9 @@
 			"current": {
 				"name": "path",
 				"sources": {
-					"@src": "./dist/src",
-					"@api": "./temp/src/api",
+					"@src": "./temp/src",
+					"@server": "./temp/src/server",
+					"@client": "./temp/src/client",
 					"@packages": "./packages",
 					"@serverpackages": "./serverPackages"
 				}

@@ -1,98 +1,127 @@
 import Conversation from "#classes/conversation.js";
-import database from "#utils/database.js";
-import ConversationMessage from "#classes/conversationMessage.js";
-import Player from "#classes/player.js";
+import prismaClient from "#utils/prisma.js";
+import {
+    generatePersonalityHash,
+    generatePersonalityPrompt,
+} from "#utils/personalityUtils.js";
+import logger from "#utils/logger.js";
 
-function deserializeDataEntry(dataEntry) {
-    const conversation = new Conversation(
-        dataEntry.id,
-        dataEntry.secret,
-        dataEntry.prompt,
-        [],
-    );
-
-    if (dataEntry.messageHistory && dataEntry.messageHistory.length > 1) {
-        dataEntry.messageHistory.slice(1).forEach((message) => {
-            conversation.messageHistory.push(
-                new ConversationMessage(
-                    message.role,
-                    message.content,
-                    message.sender,
-                    message.timestamp,
-                ),
-            );
-        });
-    }
-
-    if (dataEntry.players) {
-        dataEntry.players.forEach((player) => {
-            conversation.addPlayer(new Player(player.id, player.name));
-        });
-    }
-
-    return conversation;
-}
-
-// Singleton class that manages conversations, allowing adding, removing, updating and retrieving conversations.
+/**
+ * Manages conversation creation and retrieval.
+ * Acts as a wrapper around Prisma to ensure consistent class instantiation.
+ */
 class ConversationManager {
-    /** @type {import("./conversation").default[]} */
-    conversations = [];
-
-    constructor() {
-        this.conversations = Object.values(database.getAll()).map(
-            deserializeDataEntry,
+    /**
+     * Creates a new conversation with the given personality and users
+     * @param { {
+     *     name: string,
+     *     bio: Array<string>,
+     *     lore: Array<string>,
+     *     knowledge: Array<string>,
+     *     messageExamples: Array<Array<{ user: string, content: string }>>,
+     *     systemMessage: string
+     * } } personality - The personality configuration object
+     * @param { Array<{ id: string, name: string }> } users - Array of users to add to conversation
+     * @param { string } persistenceToken - Token for persisting the conversation
+     * @returns { Promise<Conversation> } The created conversation instance
+     * @throws { Error } If conversation creation fails
+     */
+    async createConversation(personality, users, persistenceToken) {
+        const personalityHash = generatePersonalityHash(personality);
+        const personalityRecord = await this.getOrCreatePersonality(
+            personality,
+            personalityHash,
         );
-    }
 
-    createConversation(prompt, players) {
-        const id = this._getNextId();
-        const secret = this._generateSecret();
+        const fetchedConversation = await prismaClient.conversation.create({
+            data: {
+                persistenceToken,
+                personalityId: personalityRecord.id,
+                users: {
+                    connectOrCreate: users.map((user) => ({
+                        where: { id: user.id },
+                        create: {
+                            id: user.id,
+                            name: user.name,
+                        },
+                    })),
+                },
+            },
+        });
 
-        const conversation = new Conversation(id, secret, prompt, players);
-        this.conversations.push(conversation);
-
-        return conversation;
-    }
-
-    getConversation(id) {
-        return this.conversations.find(
-            (conversation) => conversation.id === id,
-        );
-    }
-
-    getConversationBySecret(secret) {
-        return this.conversations.find(
-            (conversation) => conversation.secret === secret,
-        );
-    }
-
-    endConversation(conversation) {
-        this.conversations = this.conversations.filter(
-            (c) => c.id !== conversation.id,
-        );
-    }
-
-    async sendMessage(conversation, message) {
-        return await conversation.sendMessage(message);
-    }
-
-    _getNextId() {
-        return this.conversations.length + 1;
-    }
-
-    _generateSecret() {
-        const uuid = crypto.randomUUID();
-
-        // just in case!
-        if (
-            this.conversations.some(
-                (conversation) => conversation.secret === uuid,
-            )
-        ) {
-            return this._generateSecret();
+        if (!fetchedConversation) {
+            throw new Error("Failed to create conversation");
         }
 
-        return uuid;
+        return new Conversation(fetchedConversation);
+    }
+
+    /**
+     * Gets a conversation by its ID
+     * @param { string } id - The conversation ID
+     * @returns { Promise<Conversation | null> } The conversation instance or null if not found
+     */
+    async getConversation(id) {
+        const conversation = await prismaClient.conversation.findUnique({
+            where: { id },
+        });
+
+        return conversation ? new Conversation(conversation) : null;
+    }
+
+    /**
+     * Gets a conversation by its secret
+     * @param { string } secret - The conversation secret
+     * @returns { Promise<Conversation | null> } The conversation instance or null if not found
+     */
+    async getConversationBySecret(secret) {
+        const conversation = await prismaClient.conversation.findFirst({
+            where: { secret },
+        });
+
+        return conversation ? new Conversation(conversation) : null;
+    }
+
+    /**
+     * Gets a conversation by its persistence token
+     * @param { string } persistenceToken - The persistence token
+     * @returns { Promise<Conversation | null> } The conversation instance or null if not found
+     */
+    async getConversationByPersistenceToken(persistenceToken) {
+        const conversation = await prismaClient.conversation.findFirst({
+            where: { persistenceToken },
+        });
+
+        return conversation ? new Conversation(conversation) : null;
+    }
+
+    /**
+     * Creates or retrieves a personality record
+     * @private
+     * @param { Object } personality - The personality configuration
+     * @param { string } personalityHash - Hash of the personality configuration
+     * @returns { Promise<Object> } The personality record
+     */
+    async getOrCreatePersonality(personality, personalityHash) {
+        const existingRecord = await prismaClient.personality.findUnique({
+            where: { hash: personalityHash },
+        });
+
+        if (existingRecord) {
+            return existingRecord;
+        }
+
+        logger.debug(
+            `Registered new personality ${personality.name} with hash ${personalityHash}`,
+        );
+
+        return prismaClient.personality.create({
+            data: {
+                hash: personalityHash,
+                name: personality.name,
+                prompt: generatePersonalityPrompt(personality),
+            },
+        });
     }
 }
 

@@ -9,3 +9,6 @@ logs
 
 # Data
 data
+
+# Prisma
+prisma/migrations

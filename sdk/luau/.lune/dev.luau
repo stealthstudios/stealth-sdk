@@ -87,14 +87,13 @@ end, function(files)
 
 		-- get the second part of the file path
 		local secondPart = file:match("^./([^/]+)")
-		local pathSuffix = secondPart:gsub("src", ""):gsub("^.", string.upper)
 
 		file = file:gsub(`./{secondPart}/`, "")
 
-		if fs.isFile(`dist{pathSuffix}/{file}`) then
-			fs.removeFile(`dist{pathSuffix}/{file}`)
-		elseif fs.isDir(`dist{pathSuffix}/{file}`) then
-			fs.removeDir(`dist{pathSuffix}/{file}`)
+		if fs.isFile(`dist/{secondPart}/{file}`) then
+			fs.removeFile(`dist/{secondPart}/{file}`)
+		elseif fs.isDir(`dist/{secondPart}/{file}`) then
+			fs.removeDir(`dist/{secondPart}/{file}`)
 		end
 	end
 

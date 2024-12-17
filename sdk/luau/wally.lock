@@ -3,6 +3,11 @@
 registry = "test"
 
 [[package]]
-name = "tijne/chatbotengine"
-version = "0.1.0"
+name = "red-blox/ratelimit"
+version = "1.0.1"
 dependencies = []
+
+[[package]]
+name = "tijne/chatbot-engine"
+version = "0.1.0"
+dependencies = [["ratelimit", "red-blox/ratelimit@1.0.1"]]

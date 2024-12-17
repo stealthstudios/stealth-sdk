@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Player {
+  id   String @id
+  name String
+
+  Conversation   Conversation? @relation(fields: [conversationId], references: [id])
+  conversationId Int?
+
+  Messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Conversation {
+  id               Int     @id @default(autoincrement())
+  secret           String  @default(uuid())
+  persistenceToken String?
+  busy             Boolean @default(false)
+
+  personality   Personality? @relation(fields: [personalityId], references: [id])
+  personalityId Int?
+
+  users    Player[]
+  messages Message[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id      Int    @id @default(autoincrement())
+  content String
+  role    String
+
+  sender   Player? @relation(fields: [senderId], references: [id])
+  senderId String?
+
+  context MessageContext[]
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversationId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MessageContext {
+  id    Int    @id @default(autoincrement())
+  key   String
+  value String
+
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  messageId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Personality {
+  id   Int    @id @default(autoincrement())
+  hash String @unique
+
+  name String
+
+  prompt String?
+
+  conversations Conversation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
