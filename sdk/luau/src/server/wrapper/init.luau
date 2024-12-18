@@ -68,7 +68,7 @@ function wrapper.send(
 		`{wrapperData.url}/api/conversation/send`,
 		"POST",
 		{
-			["conversation-secret"] = conversation.secret,
+			secret = conversation.secret,
 			context = context and formatDictionary(context) or {},
 			message = message,
 			playerId = tostring(player.UserId),
@@ -90,7 +90,7 @@ end
 
 function wrapper.update(conversation: ConversationData, users: { Player }?, prompt: string?): boolean
 	local response: Response<nil> = sendRequest(`{wrapperData.url}/api/conversation/update`, "POST", {
-		["conversation-secret"] = conversation.secret,
+		secret = conversation.secret,
 		users = users and formatUsers(users) or {},
 		prompt = prompt,
 	}, {
@@ -108,7 +108,7 @@ end
 
 function wrapper.finish(conversation: ConversationData): boolean
 	local response: Response<nil> = sendRequest(`{wrapperData.url}/api/conversation/finish`, "POST", {
-		["conversation-secret"] = conversation.secret,
+		secret = conversation.secret,
 	}, {
 		Authorization = wrapperData.auth,
 	})

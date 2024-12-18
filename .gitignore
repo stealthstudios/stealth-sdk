@@ -1,2 +1,17 @@
 # PGAdmin
 pgadmin-data
+
+# Node
+node_modules
+
+# Env
+.env
+
+# Logs
+logs
+
+# Data
+data
+
+# Prisma
+prisma/migrations

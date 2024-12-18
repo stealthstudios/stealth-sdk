@@ -23,8 +23,7 @@ function conversation.send(
 		secret = self.secret,
 	}
 
-	local response = wrapper.send(credentials, message, context, player)
-	return response
+	return wrapper.send(credentials, message, context, player)
 end
 
 function conversation.finish(self: Conversation)
@@ -60,6 +59,10 @@ function conversation.removePlayer(self: Conversation, player: Player)
 	}, self.partakingPlayers)
 end
 
+function conversation.getPlayers(self: Conversation): { Player }
+	return self.partakingPlayers
+end
+
 function conversation.containsPlayer(self: Conversation, player: Player): boolean
 	return table.find(self.partakingPlayers, player) ~= nil
 end
@@ -73,7 +76,7 @@ type Credentials = {
 	secret: string,
 }
 
-type Response = {
+export type Response = {
 	flagged: boolean,
 	content: string,
 }

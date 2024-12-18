@@ -124,11 +124,11 @@ function engine.update(self: Engine): nil
 	return nil
 end
 
-function engine.chatted(self: Engine, player: Player, message: string): nil
+local function engineChat(self: Engine, player: Player, message: string): nil
 	for _, character: modelCharacter.Character in self.characters do
 		local conversation = character:getConversationForPlayer(player, false)
 		if conversation then
-			character:chat(player, message)
+			character:_chat(player, message)
 		end
 	end
 
@@ -138,7 +138,7 @@ end
 local function handlePlayerChatted(player: Player)
 	player.Chatted:Connect(function(message)
 		for _, activeEngine in activeEngines do
-			activeEngine:chatted(player, message)
+			engineChat(activeEngine, player, message)
 		end
 	end)
 end

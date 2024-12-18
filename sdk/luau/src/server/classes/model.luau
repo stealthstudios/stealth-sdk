@@ -1,11 +1,12 @@
-local Chat = game:GetService("Chat")
-local Players = game:GetService("Players")
-
-local constants = require("@src/constants")
-local conversation = require("@server/classes/conversation")
-
 local characterModel = {}
 characterModel.__index = characterModel
+
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+
+local communication = require("@src/communication")
+local constants = require("@src/constants")
+local conversation = require("@server/classes/conversation")
 
 function characterModel.new(model: Model, config: ModelConfig): CharacterModel
 	local self = {
@@ -13,6 +14,7 @@ function characterModel.new(model: Model, config: ModelConfig): CharacterModel
 		config = config,
 		playersInRadius = {},
 		conversations = {},
+		_chats = {},
 	}
 
 	return setmetatable(self, characterModel)
@@ -27,13 +29,13 @@ function characterModel.update(self: CharacterModel): UpdateState
 		leave = {},
 	}
 
-	for _, player in newPlayers do
+	for _, player: Player in newPlayers do
 		if not table.find(currentPlayers, player) then
 			table.insert(playerChanges.enter, player)
 		end
 	end
 
-	for _, player in currentPlayers do
+	for _, player: Player in currentPlayers do
 		if not table.find(newPlayers, player) then
 			table.insert(playerChanges.leave, player)
 		end
@@ -45,11 +47,11 @@ function characterModel.update(self: CharacterModel): UpdateState
 end
 
 function characterModel.apply(self: CharacterModel, state: UpdateState)
-	for _, player in state.playerChanges.enter do
+	for _, player: Player in state.playerChanges.enter do
 		table.insert(self.playersInRadius, player)
 	end
 
-	for _, player in state.playerChanges.leave do
+	for _, player: Player in state.playerChanges.leave do
 		table.remove(self.playersInRadius, table.find(self.playersInRadius, player))
 	end
 end
@@ -58,8 +60,7 @@ function characterModel.getDistanceToPlayer(self: CharacterModel, player: Player
 	local distance = player:DistanceFromCharacter(self.model:GetPivot().Position)
 
 	if distance == 0 then
-		-- character isn't loaded (this number will *never* be 0 due to floating point precision)
-		return math.huge
+		return math.huge -- Character isn't loaded (this number will never be 0 due to floating point precision)
 	end
 
 	return distance
@@ -69,7 +70,7 @@ function characterModel.getPlayersInRadius(self: CharacterModel, radius: number)
 	local players = Players:GetPlayers()
 	local playersInRadius = {}
 
-	for _, player in players do
+	for _, player: Player in players do
 		if self:getDistanceToPlayer(player) <= radius then
 			table.insert(playersInRadius, player)
 		end
@@ -79,7 +80,7 @@ function characterModel.getPlayersInRadius(self: CharacterModel, radius: number)
 end
 
 function characterModel.isInteractingWithPlayer(self: CharacterModel, player: Player): boolean
-	for _, playerInRadius in self.playersInRadius do
+	for _, playerInRadius: Player in self.playersInRadius do
 		if playerInRadius == player then
 			return true
 		end
@@ -88,18 +89,70 @@ function characterModel.isInteractingWithPlayer(self: CharacterModel, player: Pl
 	return false
 end
 
-function characterModel.say(self: CharacterModel, message: string): nil
-	local success, rootPart = pcall(function()
-		return self.model.PrimaryPart
-	end)
+local function sendDataToAllConversationMembers(convo: conversation.Conversation, topic: string, ...: any)
+	for _, player: Player in convo:getPlayers() do
+		communication.sendToPlayer(player, topic, ...)
+	end
+end
 
-	if not success then
-		warn(`{constants.ENGINE_LOG_PREFIX} Model has no root part!`)
-		return nil
+function characterModel.createChat(self: CharacterModel, chatConversation: conversation.Conversation): string
+	-- check if this conversation is from this model
+	local conversationFromModel = false
+
+	for _, modelConversation: conversation.Conversation in self.conversations do
+		if modelConversation == chatConversation then
+			conversationFromModel = true
+			break
+		end
 	end
 
-	Chat:Chat(rootPart, message)
-	return nil
+	if not conversationFromModel then
+		error(`{constants.ENGINE_LOG_PREFIX} Conversation {chatConversation.id} is not from this model!`)
+	end
+
+	local chatId = HttpService:GenerateGUID(false)
+	self._chats[chatId] = chatConversation
+
+	sendDataToAllConversationMembers(chatConversation, "chatStarted", {
+		chatId = chatId,
+		model = self.model,
+	})
+
+	return chatId
+end
+
+function characterModel.cancelChat(self: CharacterModel, chatId: string)
+	if not self._chats[chatId] then
+		return
+	end
+
+	sendDataToAllConversationMembers(self._chats[chatId], "chatCancelled", chatId)
+	self:cleanChat(chatId)
+end
+
+function characterModel.flagChat(self: CharacterModel, chatId: string)
+	if not self._chats[chatId] then
+		return
+	end
+
+	sendDataToAllConversationMembers(self._chats[chatId], "chatFlagged", chatId)
+	self:cleanChat(chatId)
+end
+
+function characterModel.setChatContent(self: CharacterModel, chatId: string, player: Player, content: string)
+	if not self._chats[chatId] then
+		return
+	end
+
+	communication.sendToPlayer(player, "chatContentReceived", chatId, content)
+end
+
+function characterModel.cleanChat(self: CharacterModel, chatId: string)
+	if not self._chats[chatId] then
+		return
+	end
+
+	self._chats[chatId] = nil
 end
 
 type UpdateState = {
@@ -121,6 +174,7 @@ export type CharacterModel = typeof(setmetatable(
 		config: ModelConfig,
 		playersInRadius: { Player },
 		conversations: { conversation.Conversation },
+		_chats: { [string]: conversation.Conversation },
 	},
 	characterModel
 ))

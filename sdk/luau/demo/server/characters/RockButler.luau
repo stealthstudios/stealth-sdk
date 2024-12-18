@@ -1,3 +1,4 @@
+local TextService = game:GetService("TextService")
 local engine = require("../../../src/init").server()
 
 return engine.createCharacter({
@@ -65,26 +66,40 @@ return engine.createCharacter({
 	events = {
 		onChatted = function(self, player, message)
 			local conversation = self:getConversationForPlayer(player)
-
-			if conversation then
-				local reply = conversation:send(player, message, {
-					gold = "1000",
-				})
-
-				if not reply then
-					return
-				end
-
-				local model = self:getInteractingModel(player)
-
-				if model then
-					if reply.flagged then
-						model:say("I'm sorry, but I can't say that.")
-					else
-						model:say(reply.content)
-					end
-				end
+			local model = self:getInteractingModel(player)
+			if not conversation or not model then
+				return
 			end
+
+			local chatId = model:createChat(conversation)
+			local reply = conversation:send(player, message, {
+				gold = 1000,
+			})
+			if not reply then
+				model:cancelChat(chatId)
+				return
+			end
+
+			if reply.flagged then
+				model:flagChat(chatId)
+				return
+			end
+
+			local partakingPlayers = conversation:getPlayers()
+
+			for _, partakingPlayer: Player in partakingPlayers do
+				local filteredResult = TextService:FilterStringAsync(reply.content, partakingPlayer.UserId)
+
+				if not filteredResult then
+					continue
+				end
+
+				local filteredContent = filteredResult:GetChatForUserAsync(partakingPlayer.UserId)
+
+				model:setChatContent(chatId, partakingPlayer, filteredContent)
+			end
+
+			model:cleanChat(chatId)
 		end,
 	},
 })

@@ -4,62 +4,55 @@ import { openaiClient } from "#utils/openai.js";
 import logger from "#utils/logger.js";
 
 export default class Conversation {
-    /** The unique identifier of the conversation */
-    /** @type { number } */
+    /** @type {number} The unique identifier of the conversation */
     id;
 
-    /** The secret token used to access this conversation */
-    /** @type { string } */
+    /** @type {string} The secret token used to access this conversation */
     secret;
 
-    /** Token used for conversation persistence */
-    /** @type { string | null } */
+    /** @type {string|null} Token used for conversation persistence */
     persistenceToken;
 
-    /** Whether the conversation is currently processing */
-    /** @type { boolean } */
+    /** @type {boolean} Whether the conversation is currently processing */
     busy = false;
 
-    /** ID of the personality associated with this conversation
-     *  This is saved in the class instead of the database because it is unable to change mid-conversation
-     *  @type { number | null }
-     */
+    /** @type {number|null} ID of the personality associated with this conversation */
     personalityId;
 
     /**
-     * @param { prismaClient["conversation"] } prismaConversation
+     * @param {object} conversation Prisma conversation object
      */
-    constructor(prismaConversation) {
-        this.id = prismaConversation.id;
-        this.secret = prismaConversation.secret;
-        this.persistenceToken = prismaConversation.persistenceToken;
-        this.busy = prismaConversation.busy;
-        this.personalityId = prismaConversation.personalityId;
+    constructor(conversation) {
+        this.id = conversation.id;
+        this.secret = conversation.secret;
+        this.persistenceToken = conversation.persistenceToken;
+        this.busy = conversation.busy;
+        this.personalityId = conversation.personalityId;
     }
 
     /**
      * Updates conversation users
-     * @param { { users: Array<{ id: string, name: string }> } } data Update data containing users
+     * @param {{users: Array<{id: string, name: string}>}} data Update data containing users
      */
-    async update(data) {
-        try {
-            if (!data.users) return;
+    async update({ users }) {
+        if (!users) return;
 
+        try {
             await prismaClient.conversation.update({
                 where: { id: this.id },
                 data: {
                     users: {
                         set: [],
-                        connectOrCreate: data.users.map((player) => ({
-                            where: { id: player.id },
+                        connectOrCreate: users.map((user) => ({
+                            where: { id: user.id },
                             create: {
-                                id: player.id,
-                                name: player.name,
+                                id: user.id,
+                                name: user.name,
                             },
                         })),
-                        updateMany: data.users.map((player) => ({
-                            where: { id: player.id },
-                            data: { name: player.name },
+                        updateMany: users.map((user) => ({
+                            where: { id: user.id },
+                            data: { name: user.name },
                         })),
                     },
                 },
@@ -101,12 +94,12 @@ export default class Conversation {
 
     /**
      * Processes and sends a message in the conversation
-     * @param { string } message Message content
-     * @param { Array<{ key: string, value: string }> } context Additional context for the message
-     * @param { string } playerId ID of sending player
-     * @returns { Promise<{ flagged: boolean, content: string } | null> }
+     * @param {string} message Message content
+     * @param {Array<{key: string, value: string}>} context Additional context
+     * @param {string} userId ID of sending user
+     * @returns {Promise<{flagged: boolean, content: string}|null>}
      */
-    async send(message, context, playerId) {
+    async send(message, context, userId) {
         const { busy } = await prismaClient.conversation.findUnique({
             where: { id: this.id },
             select: { busy: true },
@@ -120,13 +113,13 @@ export default class Conversation {
             const { messages, response } = await this.processMessage(
                 message,
                 context,
-                playerId,
+                userId,
             );
 
             await this.saveMessages(messages, context);
             return response;
         } catch (error) {
-            throw new Error(error);
+            logger.error(error);
         } finally {
             await this.setBusyState(false);
         }
@@ -134,7 +127,7 @@ export default class Conversation {
 
     /**
      * Sets the conversation's busy state
-     * @param { boolean } state Busy state to set
+     * @private
      */
     async setBusyState(state) {
         await prismaClient.conversation.update({
@@ -147,23 +140,23 @@ export default class Conversation {
      * Processes a message and gets AI response
      * @private
      */
-    async processMessage(message, context, playerId) {
+    async processMessage(message, context, userId) {
         const encoding = getEncoding("o200k_base");
-        const fullRecord = await this.getConversationRecord();
+        const record = await this.getConversationRecord();
         const { usedMessages, tokenCount } = this.prepareMessageHistory(
-            fullRecord.messages,
+            record.messages,
             encoding,
         );
 
         const totalTokens =
             tokenCount +
-            encoding.encode(fullRecord.personality.prompt).length +
+            encoding.encode(record.personality.prompt).length +
             encoding.encode(message).length;
 
         const contextMessage = this.buildContextMessage(
             context,
-            fullRecord.users,
-            playerId,
+            record.users,
+            userId,
         );
 
         usedMessages.push(
@@ -174,15 +167,15 @@ export default class Conversation {
         const response = await this.getAIResponse(
             usedMessages,
             message,
-            fullRecord.users,
-            playerId,
+            record.users,
+            userId,
             totalTokens,
         );
 
         return {
             messages: [
                 { role: "system", content: contextMessage },
-                { role: "user", content: message, senderId: playerId },
+                { role: "user", content: message, senderId: userId },
                 { role: "assistant", content: response.content },
             ],
             response: {
@@ -217,14 +210,14 @@ export default class Conversation {
         const usedMessages = [messages[0]];
 
         while (tokenCount < 10000 && messagesCloned.length) {
-            const recentMessage = messagesCloned.shift();
-            if (!recentMessage) break;
+            const message = messagesCloned.shift();
+            if (!message) break;
 
             usedMessages.push({
-                role: recentMessage.role,
-                content: recentMessage.content,
+                role: message.role,
+                content: message.content,
             });
-            tokenCount += encoding.encode(recentMessage.content).length;
+            tokenCount += encoding.encode(message.content).length;
         }
 
         return { usedMessages, tokenCount };
@@ -234,24 +227,24 @@ export default class Conversation {
      * Builds context message from provided context and users
      * @private
      */
-    buildContextMessage(context, users, playerId) {
+    buildContextMessage(context, users, userId) {
         const contextWithUsers = [
             ...context,
             {
                 key: "users",
                 description:
                     "The users participating in the conversation, separated by commas.",
-                value: users.map((p) => p.name).join(", "),
+                value: users.map((user) => user.name).join(", "),
             },
             {
                 key: "username",
-                value: users.find((p) => p.id === playerId).name,
+                value: users.find((user) => user.id === userId).name,
             },
         ];
 
         return [
             "# Context",
-            ...contextWithUsers.map((c) => `${c.key}: ${c.value}`),
+            ...contextWithUsers.map((ctx) => `${ctx.key}: ${ctx.value}`),
         ].join("\n");
     }
 
@@ -259,7 +252,7 @@ export default class Conversation {
      * Gets AI response and handles moderation
      * @private
      */
-    async getAIResponse(messages, userMessage, users, playerId, tokenCount) {
+    async getAIResponse(messages, userMessage, users, userId, tokenCount) {
         const rawResponse = await openaiClient.chat.completions.create({
             model: "gpt-4o",
             messages: messages,
@@ -270,12 +263,13 @@ export default class Conversation {
 
         const moderationResult = await this.moderateContent(
             userMessage,
+            userId,
             response.content,
         );
 
-        const username = users.find((p) => p.id === playerId).name;
+        const username = users.find((user) => user.id === userId).name;
         logger.debug(
-            `${username} (${playerId}) sent a message to conversation ${this.id} (total tokens: ${tokenCount})`,
+            `${username} (${userId}) sent a message to conversation ${this.id} (total tokens: ${tokenCount})`,
         );
 
         return {
@@ -288,9 +282,9 @@ export default class Conversation {
      * Moderates message content
      * @private
      */
-    async moderateContent(userMessage, responseContent) {
+    async moderateContent(userMessage, userId, responseContent) {
         const moderationResponseRaw = await openaiClient.moderations.create({
-            input: `${userMessage.content} ${responseContent}`,
+            input: `${userMessage} ${responseContent}`,
             model: "omni-moderation-latest",
         });
 
@@ -301,7 +295,11 @@ export default class Conversation {
 
         if (moderationResponse.flagged) {
             logger.warn(
-                `Message by user ${userMessage.sender} flagged by moderation (${moderationResponse.categories}). The message was ${userMessage.content} and the response was ${responseContent}`,
+                `Message by user ${userId} flagged by moderation (${JSON.stringify(
+                    moderationResponse.categories,
+                    null,
+                    2,
+                )}). The message was ${userMessage} and the response was ${responseContent}`,
             );
             return { flagged: true };
         }
@@ -325,9 +323,9 @@ export default class Conversation {
 
         const lastMessageId = createdMessages[createdMessages.length - 1].id;
         await prismaClient.messageContext.createMany({
-            data: context.map((c) => ({
-                key: c.key,
-                value: c.value,
+            data: context.map((ctx) => ({
+                key: ctx.key,
+                value: ctx.value,
                 messageId: lastMessageId,
             })),
         });

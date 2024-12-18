@@ -6,9 +6,9 @@ services:
     restart: always
     shm_size: 128mb
     volumes:
-      - ./backend/data/db:/var/lib/postgresql/data
+      - ./data/db:/var/lib/postgresql/data
     env_file:
-      - ./backend/.env
+      - ./.env
     ports:
       - "3307:5432"
 
@@ -21,7 +21,7 @@ services:
     ports:
       - "8080:80"
     env_file:
-      - ./backend/.env
+      - ./.env
     volumes:
       - ./pgadmin-data:/var/lib/pgadmin
 
@@ -32,8 +32,10 @@ services:
     image: node:20
     restart: always
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
     volumes:
-      - ./backend/logs/:/app/logs/
+      - ./logs/:/app/logs/
     working_dir: /app
+    env_file:
+      - ./.env

@@ -6,3 +6,4 @@ realm = "shared"
 
 [dependencies]
 ratelimit = "red-blox/ratelimit@1.0.1"
+fusion = "elttob/fusion@0.3.0"

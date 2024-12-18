@@ -6,7 +6,7 @@ local CollectionService = game:GetService("CollectionService")
 local characterModel = require("@server/classes/model")
 local constants = require("@src/constants")
 local conversation = require("@server/classes/conversation")
-local rateLimit = require("@packages/ratelimit")(1, 4) -- 1 call per 4 seconds
+local rateLimit = require("@packages/ratelimit")(1, 2) -- 1 call per 2 seconds
 local wrapper = require("@server/wrapper")
 
 function character.new(config: Config)
@@ -67,7 +67,7 @@ function character.update(self: Character)
 	end
 end
 
-function character.chat(self: Character, player: Player, message: string)
+function character._chat(self: Character, player: Player, message: string)
 	if not rateLimit(player) then
 		return
 	end
