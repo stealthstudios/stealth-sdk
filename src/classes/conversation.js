@@ -272,9 +272,12 @@ export default class Conversation {
             `${username} (${userId}) sent a message to conversation ${this.id} (total tokens: ${tokenCount})`,
         );
 
+        // trim newlines after the response - sometimes it comes with these and it makes the bubbles ugly
+        const content = response.content.replace(/\n+$/, "");
+
         return {
             flagged: moderationResult.flagged,
-            content: response.content,
+            content: content,
         };
     }
 

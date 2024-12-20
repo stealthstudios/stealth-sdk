@@ -9,15 +9,15 @@
 ## Table of Contents
 
 - [chatbot-backend](#chatbot-backend)
-  - [Table of Contents](#table-of-contents)
-  - [Usage](#usage)
-    - [Installation](#installation)
-    - [Environment Variables](#environment-variables)
-  - [Running the application](#running-the-application)
-    - [Development](#development)
-    - [Production](#production)
-    - [Docker](#docker)
-  - [Endpoint Documentation](#endpoint-documentation)
+    - [Table of Contents](#table-of-contents)
+    - [Usage](#usage)
+        - [Installation](#installation)
+        - [Environment Variables](#environment-variables)
+    - [Running the application](#running-the-application)
+        - [Development](#development)
+        - [Production](#production)
+        - [Docker](#docker)
+    - [Endpoint Documentation](#endpoint-documentation)
 
 ## Usage
 
@@ -56,8 +56,7 @@ npm run start
 
 ### Docker
 
-Launch with `docker compose up -d --build`.
-When editing the port in `compose.yml`, make sure to update `POSTGRES_PORT` in `.env`.
+Launch with `start.bat` or `start.sh` depending on your operating system.
 
 ## Endpoint Documentation
 

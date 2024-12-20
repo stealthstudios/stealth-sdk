@@ -6,7 +6,7 @@ local peek = fusion.peek
 
 local textMap = {
 	started = {
-		text = "⏳ Generating response...",
+		text = "⏳ Thinking..",
 		color = Color3.fromHex("#6b7280"),
 	},
 	received = {
@@ -23,6 +23,10 @@ local textMap = {
 	},
 }
 
+local function lerp(a: number, b: number, t: number)
+	return a + (b - a) * t
+end
+
 local function chatBubble(props: Props)
 	local scope = props.chat.scope
 	local status = props.chat.status
@@ -30,34 +34,62 @@ local function chatBubble(props: Props)
 
 	local text = scope:Computed(function(use)
 		local content = use(props.chat.content)
+		local currentStatus = use(status)
+		local adorneeDistance = use(props.adorneeDistance)
+
+		if adorneeDistance >= 30 then
+			return "..."
+		end
+
 		if content then
 			return content
 		end
-		return textMap[use(status)].text
+
+		return textMap[use(currentStatus)].text
 	end)
 
 	local color = scope:Computed(function(use)
 		return textMap[use(status)].color
 	end)
 
+	-- Returns a value between 0-1 representing chat bubble visibility based on distance
+	local isVisible = scope:Computed(function(use)
+		local distance = use(props.adorneeDistance)
+		local isCurrentlyOpen = use(isOpen)
+
+		if not isCurrentlyOpen then
+			return 1
+		end
+
+		if distance >= 100 then
+			return 1
+		end
+
+		if distance >= 30 then
+			return 0.2
+		end
+
+		return 0
+	end)
+
 	local textSize = scope:Value(Vector2.new(0, 0))
 
-	local function onTextChange()
+	local function updateTextSize()
 		local newText = peek(text)
-		local getTextBoundsParams = Instance.new("GetTextBoundsParams")
-		getTextBoundsParams.Font =
+		local params = Instance.new("GetTextBoundsParams")
+		params.Font =
 			Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal)
-		getTextBoundsParams.Text = newText
-		getTextBoundsParams.Size = 20
-		getTextBoundsParams.Width = 256
-		getTextBoundsParams.RichText = true
+		params.Text = newText
+		params.Size = 20
+		params.Width = 256
+		params.RichText = true
 
-		local textBounds = TextService:GetTextBoundsAsync(getTextBoundsParams)
-		textSize:set(textBounds)
+		local bounds = TextService:GetTextBoundsAsync(params)
+		textSize:set(bounds)
 	end
 
-	table.insert(scope, scope:Observer(text):onChange(onTextChange))
-	onTextChange()
+	table.insert(scope, scope:Observer(text):onChange(updateTextSize))
+	updateTextSize()
 
 	local bubble = scope:New("Frame")({
 		Name = "Bubble",
@@ -67,13 +99,13 @@ local function chatBubble(props: Props)
 		LayoutOrder = props.layoutOrder,
 		Size = scope:Tween(
 			scope:Computed(function(use)
-				local usedTextSize = use(textSize)
+				local size = use(textSize)
 				if use(isOpen) then
-					return UDim2.fromOffset(usedTextSize.X + 32, usedTextSize.Y + 32)
+					return UDim2.fromOffset(size.X + 32, size.Y + 16)
 				end
 				return UDim2.fromOffset(0, 0)
 			end),
-			TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+			TweenInfo.new(0.8, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 		),
 		[Children] = {
 			scope:New("Frame")({
@@ -82,7 +114,7 @@ local function chatBubble(props: Props)
 				BackgroundColor3 = Color3.fromRGB(250, 250, 250),
 				BackgroundTransparency = scope:Tween(
 					scope:Computed(function(use)
-						return use(isOpen) and 0.1 or 1
+						return lerp(0.1, 1, use(isVisible))
 					end),
 					TweenInfo.new(0.4, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 				),
@@ -126,7 +158,7 @@ local function chatBubble(props: Props)
 						),
 						TextTransparency = scope:Tween(
 							scope:Computed(function(use)
-								return use(isOpen) and 0 or 1
+								return lerp(0, 1, use(isVisible))
 							end),
 							TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
 						),
@@ -147,7 +179,7 @@ local function chatBubble(props: Props)
 			scope:New("UIListLayout")({
 				Name = "Layout",
 				HorizontalAlignment = Enum.HorizontalAlignment.Center,
-				Padding = UDim.new(0, -1),
+				Padding = UDim.new(0, 0),
 				SortOrder = Enum.SortOrder.LayoutOrder,
 			}),
 
@@ -156,7 +188,12 @@ local function chatBubble(props: Props)
 				BackgroundTransparency = 1,
 				Image = "rbxasset://textures/ui/InGameChat/Caret.png",
 				ImageColor3 = Color3.fromRGB(250, 250, 250),
-				ImageTransparency = 0.1,
+				ImageTransparency = scope:Tween(
+					scope:Computed(function(use)
+						return lerp(0.1, 1, use(isVisible))
+					end),
+					TweenInfo.new(0.5, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out)
+				),
 				LayoutOrder = 2,
 				Size = scope:Tween(
 					scope:Computed(function(use)
@@ -187,6 +224,7 @@ type Props = {
 	},
 	caretEnabled: fusion.Value<fusion.Scope<typeof(fusion)>, boolean>,
 	layoutOrder: number,
+	adorneeDistance: fusion.Value<fusion.Scope<typeof(fusion)>, number>,
 }
 
 return chatBubble

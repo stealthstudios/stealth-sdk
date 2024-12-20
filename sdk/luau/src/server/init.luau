@@ -181,7 +181,7 @@ local function initializeHeartbeat()
 	RunService.Heartbeat:Connect(function(dt)
 		lastUpdate += dt
 
-		if lastUpdate < 1 then
+		if lastUpdate < constants.UPDATE_INTERVAL then
 			return
 		end
 

@@ -6,7 +6,6 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const REQUIRED_ENV_VARS = [
-    "SERVER_PORT",
     "OPENAI_API_KEY",
     "ENDPOINT_API_KEY",
     "POSTGRES_USER",
@@ -41,8 +40,10 @@ async function startServer() {
     });
 
     // Start server
-    await server.listen({ port: process.env.SERVER_PORT });
-    logger.info(`Server is running on port ${process.env.SERVER_PORT}`);
+    const port = process.env.DEV_SERVER_PORT || 3000;
+
+    server.listen({ port, host: "0.0.0.0" });
+    logger.info(`Server is running on port ${port}`);
 }
 
 startServer();

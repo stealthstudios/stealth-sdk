@@ -4,6 +4,23 @@ local Children = fusion.Children
 local chatBubble = require("@client/components/chatBubble")
 
 local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: props): BillboardGui
+	local adorneeDistance = scope:Value(0)
+
+	local function updateAdorneeDistance()
+		-- we have to re-fetch camera each time; it could change!
+		local camera = workspace.CurrentCamera
+
+		if not camera then
+			return
+		end
+
+		adorneeDistance:set(math.round((camera.CFrame.Position - props.adornee.Position).Magnitude))
+	end
+
+	updateAdorneeDistance()
+	table.insert(scope, workspace.CurrentCamera:GetPropertyChangedSignal("CFrame"):Connect(updateAdorneeDistance))
+	table.insert(scope, props.adornee:GetPropertyChangedSignal("CFrame"):Connect(updateAdorneeDistance))
+
 	local billboardGui = scope:New("BillboardGui")({
 		Adornee = props.adornee,
 		Size = UDim2.fromOffset(500, 200),
@@ -42,6 +59,7 @@ local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: p
 								caretEnabled = forPairsScope:Computed(function(use)
 									return index == #use(props.chats)
 								end),
+								adorneeDistance = adorneeDistance,
 							})
 					end),
 				},

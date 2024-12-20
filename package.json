@@ -10,7 +10,7 @@
         "#classes/*": "./src/classes/*"
     },
     "scripts": {
-        "start": "node src/index.js",
+        "deploy": "npx prisma migrate dev --name init && node src/index.js",
         "dev": "nodemon index.js --watch src",
         "lint": "eslint \"./src/**/*.js\" --config ./eslint.config.mjs",
         "format": "prettier --write \"./src/**/*.js\"",
