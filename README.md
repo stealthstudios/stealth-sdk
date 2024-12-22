@@ -9,21 +9,27 @@
 ## Table of Contents
 
 - [chatbot-backend](#chatbot-backend)
-    - [Table of Contents](#table-of-contents)
-    - [Usage](#usage)
-        - [Installation](#installation)
-        - [Environment Variables](#environment-variables)
-    - [Running the application](#running-the-application)
-        - [Development](#development)
-        - [Production](#production)
-        - [Docker](#docker)
-    - [Endpoint Documentation](#endpoint-documentation)
+  - [Table of Contents](#table-of-contents)
+  - [Usage](#usage)
+    - [Installation](#installation)
+    - [Environment Variables](#environment-variables)
+  - [Running the application](#running-the-application)
+    - [Development](#development)
+    - [Production](#production)
+    - [Docker](#docker)
+  - [Endpoint Documentation](#endpoint-documentation)
 
 ## Usage
 
+This application consists of a backend that provides the underlying logic for tracking conversations and sending requests to the OpenAI API. It is built using Node.js and Fastify, using PostgreSQL as a database.
+
+Developers can then use the SDKs to interact with this backend, and build their own chatbot applications on top of it. The current SDKs are:
+
+- Luau (Roblox)
+
 ### Installation
 
-This application was built with Node v22, and using this version of Node is recommended.
+This application was built with Node v20, and using this version of Node is recommended.
 
 ```bash
 npm install
@@ -36,7 +42,7 @@ When using this application, you need to set the following environment variables
 - `SERVER_PORT`: The port to run the server on.
 - `OPENAI_API_KEY`: The API key to use for the OpenAI API.
 - `ENDPOINT_API_KEY`: The authentication key that all incoming requests must provide.
-- `ENVIRONMENT`: The environment to run the server in. This should be set to `development` or `production`. In a development environment, certain security features are disabled to make development easier. The Scalar API key is for example filled in automatically.
+- `ENVIRONMENT`: The environment to run the server in. This should be set to `development` or `production`. In a development environment, certain security features are disabled to make development easier. The Scalar API key (in the API reference) is for example filled in automatically.
 
 ## Running the application
 
@@ -56,7 +62,11 @@ npm run start
 
 ### Docker
 
-Launch with `start.bat` or `start.sh` depending on your operating system.
+Launch with `docker.sh`. This will remove existing containers, build the image and run the container, injecting necessary environment variables.
+
+```bash
+./docker.sh
+```
 
 ## Endpoint Documentation
 

@@ -5,6 +5,7 @@ local character = require("@server/classes/character")
 local defaultCharacterConfig: character.Config = {
 	characterConfig = {
 		persistent = false,
+		individualInteractions = false,
 		personality = {
 			bio = {
 				"This is a helpful and friendly AI assistant.",
@@ -55,8 +56,10 @@ local defaultCharacterConfig: character.Config = {
 				},
 			},
 		},
-		individualInteractions = false,
 	},
+	modelConfig = {
+		interestRadius = 10,
+	}
 	events = {
 		onRadiusEnter = function(self, player)
 			self:getConversationForPlayer(player, true)

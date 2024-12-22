@@ -5,7 +5,7 @@ return engine.createCharacter({
 	characterConfig = {
 		name = "Rocky Rockington",
 		persistent = false,
-		individualInteractions = true,
+		individualInteractions = false,
 		personality = {
 			bio = {
 				"Rocky Rockington is a butler for a rich rock family, the Rockingtons.",

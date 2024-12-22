@@ -164,7 +164,6 @@ type UpdateState = {
 
 export type ModelConfig = {
 	interestRadius: number?,
-	requiresLineOfSight: boolean?,
 	[string]: nil,
 }
 
