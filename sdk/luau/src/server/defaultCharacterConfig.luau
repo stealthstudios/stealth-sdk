@@ -59,7 +59,7 @@ local defaultCharacterConfig: character.Config = {
 	},
 	modelConfig = {
 		interestRadius = 10,
-	}
+	},
 	events = {
 		onRadiusEnter = function(self, player)
 			self:getConversationForPlayer(player, true)
