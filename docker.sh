@@ -13,8 +13,14 @@ if [ -z "$DEV_SERVER_PORT" ]; then
 fi
 
 if [ "$ENVIRONMENT" = "development" ]; then
-    echo "Disabling development mode when deploying to Docker to avoid exposing the API token"
-    export ENVIRONMENT=production
+    read -p "The environment is set to \"development\". This will expose API keys on the reference pages. Are you sure you want to do this?" -n 1 -r
+    echo # (optional) move to a new line
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo
+        echo "Aborting Docker setup process. Set \"ENVIRONMENT\" to \"production\" in .env to get rid of this warning."
+        echo
+        exit
+    fi
 fi
 
 echo "Stopping container.."
