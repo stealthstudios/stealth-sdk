@@ -10,12 +10,13 @@ services:
       - "${POSTGRES_PORT}:5432"
     env_file:
       - ./.env
+    networks:
+      - app-network
 
   app:
     depends_on:
       - db
     container_name: app
-    image: node:20
     restart: always
     build:
       context: .
@@ -25,9 +26,17 @@ services:
     volumes:
       - ./logs/:/app/logs/
     working_dir: /app
-    env_file:
-      - ./.env
     environment:
+      # We selectively expose env variables to the container to make sure that it can never launch in a development environment on Docker
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+      - DEV_SERVER_PORT=${DEV_SERVER_PORT}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ENDPOINT_API_KEY=${ENDPOINT_API_KEY}
     ports:
       - "${SERVER_PORT}:3000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

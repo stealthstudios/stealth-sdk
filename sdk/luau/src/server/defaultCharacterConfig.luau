@@ -101,6 +101,11 @@ local defaultCharacterConfig: character.Config = {
 
 				local filteredContent = filteredResult:GetChatForUserAsync(partakingPlayer.UserId)
 
+				if filteredContent ~= reply.content then
+					model:flagChat(chatId)
+					return
+				end
+
 				model:setChatContent(chatId, partakingPlayer, filteredContent)
 			end
 
