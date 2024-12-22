@@ -70,4 +70,4 @@ Launch with `docker.sh`. This will remove existing containers, build the image a
 
 ## Endpoint Documentation
 
-By defining an OpenAPI scheme for every endpoint, a documentation page is generated automatically at `{server_url}/reference`.
+By defining an OpenAPI scheme for every endpoint, a documentation page is generated automatically at `/reference`. This page is generated using Scalar.
