@@ -35,7 +35,7 @@ local function chatBubble(props: Props)
 	local text = scope:Computed(function(use)
 		local content = use(props.chat.content)
 		local currentStatus = use(status)
-		local adorneeDistance = use(props.adorneeDistance)
+		local adorneeDistance = use(props.adorneeDistance) * props.distanceMultiplier
 
 		if adorneeDistance >= 30 then
 			return "..."
@@ -54,7 +54,7 @@ local function chatBubble(props: Props)
 
 	-- Returns a value between 0-1 representing chat bubble visibility based on distance
 	local isVisible = scope:Computed(function(use)
-		local distance = use(props.adorneeDistance)
+		local distance = use(props.adorneeDistance) * props.distanceMultiplier
 		local isCurrentlyOpen = use(isOpen)
 
 		if not isCurrentlyOpen then
@@ -225,6 +225,7 @@ type Props = {
 	caretEnabled: fusion.Value<fusion.Scope<typeof(fusion)>, boolean>,
 	layoutOrder: number,
 	adorneeDistance: fusion.Value<fusion.Scope<typeof(fusion)>, number>,
+	distanceMultiplier: number,
 }
 
 return chatBubble

@@ -39,6 +39,7 @@ function chatBubbleManager.new(id: string, model: Model): ManagedGui
 
 	local adornee = model.PrimaryPart or model:FindFirstChild("BillboardAdornee", true)
 	local verticalOffset = model:GetAttribute("BubbleOffset") or 0
+	local distanceMultiplier = model:GetAttribute("BubbleDistanceMultiplier") or 1
 
 	managedGuis[model] = {
 		gui = chatBubbleContainer(scope:innerScope(), {
@@ -46,6 +47,7 @@ function chatBubbleManager.new(id: string, model: Model): ManagedGui
 			adornee = adornee,
 			verticalOffset = verticalOffset,
 			parent = Players.LocalPlayer.PlayerGui,
+			distanceMultiplier = distanceMultiplier,
 		}),
 		model = model,
 		scope = scope,

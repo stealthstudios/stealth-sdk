@@ -9,10 +9,12 @@
 ## Table of Contents
 
 - [chatbot-sdk-luau](#chatbot-sdk-luau)
-  - [Table of Contents](#table-of-contents)
-  - [Setup](#setup)
-    - [Development](#development)
-  - [Character Format](#character-format)
+    - [Table of Contents](#table-of-contents)
+    - [Setup](#setup)
+        - [Development](#development)
+    - [Character Format](#character-format)
+    - [Adding NPCs](#adding-npcs)
+        - [Configuring NPCs](#configuring-npcs)
 
 ## Setup
 
@@ -189,3 +191,14 @@ An example character is provided below:
     }
 }
 ```
+
+## Adding NPCs
+
+NPCs are added by adding the NPC tag (default: `EngineNPC`) to a model. This model must have a PrimaryPart. You must then add the `Character` attribute, which should correspond to a loaded character's **name**.
+
+### Configuring NPCs
+
+NPCs feature a few customization options to improve the experience, applied via attributes:
+
+- `BubbleOffset` (number): the vertical offset of the bubble from the NPC's PrimaryPart in world space, in studs.
+- `BubbleDistanceMultiplier` (number): The distance multiplier for the bubble fade effect. If this is below 1, the distance it takes for a bubble to start fading will increase. This is useful for interactions in large ranges, as bubbles will normally start fading out at 30 studs.

@@ -60,6 +60,7 @@ local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: p
 									return index == #use(props.chats)
 								end),
 								adorneeDistance = adorneeDistance,
+								distanceMultiplier = props.distanceMultiplier,
 							})
 					end),
 				},
@@ -75,6 +76,7 @@ type props = {
 	adornee: BasePart | Attachment,
 	verticalOffset: number,
 	parent: Instance,
+	distanceMultiplier: number,
 }
 
 return chatBubbleContainer
