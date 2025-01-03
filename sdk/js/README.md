@@ -125,7 +125,7 @@ This SDK can pull data from your game's datastores through the Open Cloud API. T
 
 An example of accessing a datastore can be seen below:
 
-````javascript
+```javascript
 const response = await conversation.send(
     1,
     "What is my name, and how many wins do I have?",
@@ -157,5 +157,5 @@ const response = await conversation.send(
         // Context can be provided here. It will be sent as a system message.
         gold: 100,
     },
-);```
-````
+);
+```
