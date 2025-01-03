@@ -66,7 +66,7 @@ export class Conversation {
      * Sends a message to the conversation
      * @param {number} - ID of user sending the message
      * @param {string} message - Message content
-     * @param {Object.<string, string>} [context] - Additional context
+     * @param {Object.<string, any>} [context] - Additional context
      * @returns {Promise<{flagged: boolean, content: string}|null>}
      */
     async send(id, message, context) {

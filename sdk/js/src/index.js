@@ -8,11 +8,10 @@ export default class ChatbotInterface {
     apiWrapper;
 
     /**
-     * @param {string} url - URL of the chatbot API
-     * @param {string} auth - Authorization token
+     * @param {import("./wrapper.js").SDKData} data - Configuration data
      */
-    constructor(url, auth) {
-        this.apiWrapper = new wrapper({ url, auth });
+    constructor(data) {
+        this.apiWrapper = new wrapper(data);
     }
 
     /**

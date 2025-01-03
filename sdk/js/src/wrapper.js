@@ -1,9 +1,16 @@
 import axios from "axios";
+import { setConfig } from "openblox/config";
+import {
+    StandardDataStoresApi_V2,
+    OrderedDataStoresApi_V2,
+    MemoryStoresApi,
+} from "openblox/cloud";
 
 /**
- * @typedef {Object} WrapperData
+ * @typedef {Object} SDKData
+ * @property {string} url - URL of the chatbot API
  * @property {string} auth - Authorization token
- * @property {string} url - Base URL for API requests
+ * @property {string} openCloudKey - OpenCloud key for Roblox APIs
  */
 
 /**
@@ -28,7 +35,7 @@ import axios from "axios";
  */
 
 export default class ConversationWrapper {
-    /** @type {WrapperData} */
+    /** @type {SDKData} */
     #wrapperData = {};
 
     /**
@@ -45,10 +52,14 @@ export default class ConversationWrapper {
 
     /**
      * Initializes the wrapper with configuration data
-     * @param {WrapperData} data - Configuration data
+     * @param {SDKData} data - Configuration data
      */
     constructor(data) {
         this.#wrapperData = data;
+
+        setConfig({
+            cloudKey: data.openCloudKey,
+        });
     }
 
     /**
@@ -92,6 +103,48 @@ export default class ConversationWrapper {
      * @returns {Promise<{flagged: boolean, content: string}|null>}
      */
     async send(conversation, message, context, id) {
+        if (context.datastore) {
+            const datastoreData = context.datastore;
+            context.datastore = null;
+
+            switch (datastoreData.type) {
+                case "standard": {
+                    const { data } =
+                        await StandardDataStoresApi_V2.standardDataStoreEntry({
+                            universeId: datastoreData.universeId,
+                            dataStore: datastoreData.datastoreName,
+                            entryId: datastoreData.datastoreKey,
+                            scope: datastoreData.scope,
+                        });
+
+                    if (data) {
+                        let fields = data.value;
+
+                        if (datastoreData.fieldsPredicate) {
+                            fields = datastoreData.fieldsPredicate(fields);
+                        }
+
+                        if (fields) {
+                            // inject fields into context
+                            for (const [key, value] of Object.entries(fields)) {
+                                context[key] = value;
+                            }
+                        }
+                    }
+
+                    break;
+                }
+
+                case "ordered": {
+                    break;
+                }
+
+                case "memory": {
+                    break;
+                }
+            }
+        }
+
         try {
             const response = await axios.post(
                 `${this.#wrapperData.url}/api/conversation/send`,
