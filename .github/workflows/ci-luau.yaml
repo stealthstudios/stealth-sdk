@@ -1,4 +1,4 @@
-name: CI Luau
+name: Luau CI
 on:
     push:
         branches:
