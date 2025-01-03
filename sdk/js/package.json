@@ -3,6 +3,11 @@
     "version": "1.0.0",
     "main": "src/index.js",
     "type": "module",
+    "scripts": {
+        "lint": "eslint \"./src/**/*.js\" --config ./eslint.config.mjs",
+        "format": "prettier --write \"./src/**/*.js\"",
+        "ci:format": "prettier --check \"./src/**/*.js\""
+    },
     "author": "",
     "license": "ISC",
     "description": "",
