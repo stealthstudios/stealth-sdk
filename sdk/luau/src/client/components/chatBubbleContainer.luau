@@ -54,10 +54,22 @@ local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: p
 								chat = chat,
 								transparent = forPairsScope:Computed(function(use)
 									-- transparent if the current chat is more than 3 chats away from the last chat
-									return index <= #use(props.chats) - 3
+									local highestChatIndex = 0
+
+									for i, _ in pairs(use(props.chats)) do
+										highestChatIndex = math.max(highestChatIndex, i)
+									end
+
+									return index <= highestChatIndex - 3
 								end),
 								caretEnabled = forPairsScope:Computed(function(use)
-									return index == #use(props.chats)
+									local highestChatIndex = 0
+
+									for i, _ in pairs(use(props.chats)) do
+										highestChatIndex = math.max(highestChatIndex, i)
+									end
+
+									return index == highestChatIndex
 								end),
 								adorneeDistance = adorneeDistance,
 								distanceMultiplier = props.distanceMultiplier,
