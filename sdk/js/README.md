@@ -12,6 +12,7 @@
     - [Table of Contents](#table-of-contents)
     - [Usage](#usage)
     - [Open Cloud](#open-cloud)
+    - [Functions](#functions)
 
 ## Usage
 
@@ -37,13 +38,13 @@ const character = chatbot.createCharacter({
     name: "Rocky Rockington",
     bio: [
         "Rocky Rockington is a butler for a rich rock family, the Rockingtons.",
-        "Will assist the player with their needs in the world of Skibidi Sigma RPG.",
+        "Will assist the player with their needs in the world of Chatbot SDK RPG",
         "Answers in a polite and helpful manner.",
         "Does not express opinions or beliefs, stating only facts.",
     ],
     lore: [
         "Is a butler for a rich rock family, the Rockingtons.",
-        "Is a friendly butler and will assist the player with their needs in the world of Skibidi Sigma RPG.",
+        "Is a friendly butler and will assist the player with their needs in the world of Chatbot SDK RPG.",
         "Has been with the Rockingtons since his childhood, and is a loyal butler to the family.",
     ],
     knowledge: [
@@ -165,6 +166,44 @@ const response = await conversation.send(
         ],
         // Context can be provided here. It will be sent as a system message.
         gold: 100,
+    },
+);
+```
+
+## Functions
+
+This SDK can leverage OpenAI functions to not just converse with the AI, but also have it perform actions within the context of your game. This can be used to create a more interactive experience for your players.
+
+An example of using functions can be seen below:
+
+```javascript
+const character = chatbot.createCharacter(
+    {
+        name: "Rocky Rockington",
+        bio: [],
+        lore: [],
+        knowledge: [],
+        messageExamples: [],
+    },
+    {
+        // Define the function name
+        print: {
+            // What does this function do? When should it be used?
+            description:
+                "Prints a message to the console. The user must provide a message to print.",
+            // What parameters does this function take? What are their types (Only "string", "boolean" and "number" are supported)?
+            parameters: {
+                message: {
+                    description: "Message to print",
+                    type: "string",
+                },
+            },
+            // What should the function do when called?
+            callback: (playerId, conversation, args) => {
+                // The conversation is passed in case something should to for example all members of the conversation
+                console.log(playerId, conversation, args.message);
+            },
+        },
     },
 );
 ```

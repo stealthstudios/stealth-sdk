@@ -19,6 +19,8 @@ export default class Conversation {
     /** @type {number|null} ID of the personality associated with this conversation */
     personalityId;
 
+    functions;
+
     /**
      * @param {object} conversation Prisma conversation object
      */
@@ -43,7 +45,7 @@ export default class Conversation {
      * @param {{users: Array<{id: string, name: string}>}} data Update data containing users
      */
     async update({ users }) {
-        if (!users) return;
+        if (!users || !(await this.exists())) return;
 
         try {
             await prismaClient.conversation.update({
@@ -141,7 +143,7 @@ export default class Conversation {
 
             return response;
         } catch (error) {
-            logger.warn(error);
+            logger.error(error);
         } finally {
             if (await this.exists()) {
                 await this.setBusyState(false);
@@ -178,11 +180,6 @@ export default class Conversation {
             encoding,
         );
 
-        const totalTokens =
-            tokenCount +
-            encoding.encode(record.personality.prompt).length +
-            encoding.encode(message).length;
-
         const contextMessage = this.buildContextMessage(
             context,
             record.users,
@@ -194,12 +191,20 @@ export default class Conversation {
             { role: "user", content: message },
         );
 
+        const username = record.users.find((user) => user.id === userId).name;
+        logger.debug(
+            `${username} (${userId}) sent a message to conversation ${this.id} (total tokens: ${
+                tokenCount +
+                encoding.encode(record.personality.prompt).length +
+                encoding.encode(message).length
+            })`,
+        );
+
         const response = await this.getAIResponse(
             usedMessages,
             message,
-            record.users,
             userId,
-            totalTokens,
+            record.personality.functions,
         );
 
         return {
@@ -211,6 +216,7 @@ export default class Conversation {
             response: {
                 flagged: response.flagged,
                 content: response.flagged ? "" : response.content,
+                calls: response.calls,
             },
         };
     }
@@ -282,11 +288,45 @@ export default class Conversation {
      * Gets AI response and handles moderation
      * @private
      */
-    async getAIResponse(messages, userMessage, users, userId, tokenCount) {
+    async getAIResponse(messages, userMessage, userId, functions) {
+        let tools = [];
+
+        for (const func of functions) {
+            tools.push({
+                type: "function",
+                function: {
+                    name: func.name,
+                    description: func.description,
+                    parameters: {
+                        type: "object",
+                        properties: func.parameters,
+                    },
+                },
+            });
+        }
+
         const rawResponse = await openaiClient.chat.completions.create({
             model: "gpt-4o",
             messages: messages,
+            tools: tools,
         });
+
+        if (rawResponse.choices[0].message.tool_calls) {
+            logger.debug(
+                `Got ${rawResponse.choices[0].message.tool_calls.length} tool calls from last message response`,
+            );
+
+            return {
+                flagged: false,
+                content: "",
+                calls: rawResponse.choices[0].message.tool_calls.map(
+                    (call) => ({
+                        name: call.function.name,
+                        parameters: JSON.parse(call.function.arguments),
+                    }),
+                ),
+            };
+        }
 
         const response = rawResponse.choices[0].message;
         if (!response) throw new Error("No response from OpenAI");
@@ -295,11 +335,6 @@ export default class Conversation {
             userMessage,
             userId,
             response.content,
-        );
-
-        const username = users.find((user) => user.id === userId).name;
-        logger.debug(
-            `${username} (${userId}) sent a message to conversation ${this.id} (total tokens: ${tokenCount})`,
         );
 
         // trim newlines after the response - sometimes it comes with these and it makes the bubbles ugly

@@ -38,6 +38,21 @@ export default async function (app) {
                             flagged: { type: "boolean" },
                             cancelled: { type: "boolean" },
                             content: { type: "string" },
+                            calls: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        name: { type: "string" },
+                                        parameters: {
+                                            type: "object",
+                                            additionalProperties: {
+                                                type: "string",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
                         },
                     },
                     403: {

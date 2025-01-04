@@ -121,6 +121,15 @@ function characterModel.createChat(self: CharacterModel, chatConversation: conve
 	return chatId
 end
 
+function characterModel.completeChat(self: CharacterModel, chatId: string)
+	if not self._chats[chatId] then
+		return
+	end
+
+	sendDataToAllConversationMembers(self._chats[chatId], "chatCompleted", chatId)
+	self:cleanChat(chatId)
+end
+
 function characterModel.cancelChat(self: CharacterModel, chatId: string)
 	if not self._chats[chatId] then
 		return

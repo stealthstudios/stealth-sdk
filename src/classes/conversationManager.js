@@ -26,10 +26,11 @@ class ConversationManager {
      * @returns { Promise<Conversation> } The created conversation instance
      * @throws { Error } If conversation creation fails
      */
-    async createConversation(personality, users, persistenceToken) {
-        const personalityHash = generatePersonalityHash(personality);
+    async createConversation(personality, functions, users, persistenceToken) {
+        const personalityHash = generatePersonalityHash(personality, functions);
         const personalityRecord = await this.getOrCreatePersonality(
             personality,
+            functions,
             personalityHash,
         );
 
@@ -102,7 +103,7 @@ class ConversationManager {
      * @param { string } personalityHash - Hash of the personality configuration
      * @returns { Promise<Object> } The personality record
      */
-    async getOrCreatePersonality(personality, personalityHash) {
+    async getOrCreatePersonality(personality, functions, personalityHash) {
         const existingRecord = await prismaClient.personality.findUnique({
             where: { hash: personalityHash },
         });
@@ -117,9 +118,10 @@ class ConversationManager {
 
         return prismaClient.personality.create({
             data: {
-                hash: personalityHash,
                 name: personality.name,
+                hash: personalityHash,
                 prompt: generatePersonalityPrompt(personality),
+                functions: functions,
             },
         });
     }

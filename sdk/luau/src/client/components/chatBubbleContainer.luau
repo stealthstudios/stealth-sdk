@@ -23,6 +23,7 @@ local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: p
 
 	local billboardGui = scope:New("BillboardGui")({
 		Adornee = props.adornee,
+		AlwaysOnTop = true,
 		Size = UDim2.fromOffset(500, 200),
 		SizeOffset = Vector2.new(0, 0.5),
 		StudsOffsetWorldSpace = Vector3.new(0, props.verticalOffset, 0),

@@ -5,10 +5,15 @@ import crypto from "crypto";
  * @param { Object } personality - The personality object to hash
  * @returns { string } The hex digest of the hash
  */
-export function generatePersonalityHash(personality) {
+export function generatePersonalityHash(personality, functions) {
     return crypto
         .createHash("sha256")
-        .update(JSON.stringify(personality))
+        .update(
+            JSON.stringify({
+                personality,
+                functions,
+            }),
+        )
         .digest("hex");
 }
 

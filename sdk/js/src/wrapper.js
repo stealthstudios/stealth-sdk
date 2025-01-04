@@ -22,6 +22,20 @@ import {
  */
 
 /**
+ * @typedef {Object} FunctionParameter
+ * @property {string} name - Name of the parameter
+ * @property {string} description - Description of what the parameter does
+ * @property {("string"|"number"|"boolean")} type - Type of the parameter
+ */
+
+/**
+ * @typedef {Object} Function
+ * @property {string} [description] - Optional description of what the function does
+ * @property {Object.<string, FunctionParameter>} parameters - Map of parameter names to their definitions
+ * @property {function(string, Object.<string, *>): void} callback - Function to execute with player ID and args
+ */
+
+/**
  * @typedef {Object} User
  * @property {number} id - Unique user ID
  * @property {string} name - User name
@@ -48,11 +62,28 @@ export default class ConversationWrapper {
         }));
     }
 
-    async create(personality, users = [], persistenceToken) {
+    async create(personality, functions = [], users = [], persistenceToken) {
+        const formattedFunctions = [];
+
+        if (functions) {
+            for (const [name, func] of Object.entries(functions)) {
+                formattedFunctions.push({
+                    name: name,
+                    description: func.description,
+                    parameters: func.parameters,
+                });
+            }
+        }
+
         try {
             const response = await axios.post(
                 `${this.#wrapperData.url}/api/conversation/create`,
-                { persistenceToken, personality, users },
+                {
+                    persistenceToken,
+                    personality,
+                    users,
+                    functions: formattedFunctions,
+                },
                 { headers: { Authorization: this.#wrapperData.auth } },
             );
 

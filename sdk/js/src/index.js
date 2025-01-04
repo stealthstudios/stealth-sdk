@@ -17,9 +17,10 @@ export default class ChatbotInterface {
     /**
      * Creates a new character
      * @param {import('./wrapper.js').Personality} personality - Personality configuration
+     * @param {import('./wrapper.js').Function[]} [functions] - Functions to add to the character
      * @returns {import('./character.js').Character}
      */
-    createCharacter(personality) {
-        return new Character(personality, this.apiWrapper);
+    createCharacter(personality, functions = []) {
+        return new Character(personality, functions, this.apiWrapper);
     }
 }

@@ -88,6 +88,12 @@ local defaultCharacterConfig: character.Config = {
 				return
 			end
 
+			if reply.calls then
+				self:executeFunctions(player, reply.calls)
+				model:closeChat(chatId)
+				return
+			end
+
 			if reply.cancelled then
 				model:cancelChat(chatId)
 				return

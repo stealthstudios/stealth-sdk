@@ -113,6 +113,36 @@ An example character is provided below:
             },
         },
     },
+    -- OpenAI functions to be passed to the backend.
+    functions = {
+		color = {
+            -- What does this function do, when should it be called?
+			description = "Changes the color of the baseplate",
+			parameters = {
+				color = {
+					description = 'The color to change to. Can be either "red", "green", or "blue".',
+                    -- Type can be either "string", "number" or "boolean".
+					type = "string",
+				},
+			},
+            -- Player is passed to provide specific functionality for the player, and conversation data is passed so that functionality can be provided for all participants.
+			callback = function(
+				player,
+				conversation,
+				data: {
+					color: string,
+				}
+			)
+				if data.color == "red" then
+					game.Workspace.Baseplate.BrickColor = BrickColor.Red()
+				elseif data.color == "green" then
+					game.Workspace.Baseplate.BrickColor = BrickColor.Green()
+				elseif data.color == "blue" then
+					game.Workspace.Baseplate.BrickColor = BrickColor.Blue()
+				end
+			end,
+		},
+	},
     -- This config is optional.
     modelConfig = {
         -- The range where a model will start a conversation with a user.
@@ -156,6 +186,13 @@ An example character is provided below:
                 model:cancelChat(chatId)
                 return
             end
+
+            -- The backend called functions that should be executed by the server
+			if reply.calls then
+				self:executeFunctions(player, reply.calls)
+				model:closeChat(chatId)
+				return
+			end
 
             -- The player left the radius while the model was processing the message or there was another reason why the chat could not be completed.
             if reply.cancelled then

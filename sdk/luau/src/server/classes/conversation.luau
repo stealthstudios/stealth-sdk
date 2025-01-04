@@ -79,6 +79,15 @@ type Credentials = {
 export type Response = {
 	flagged: boolean,
 	content: string,
+	cancelled: boolean?,
+	calls: {
+		{
+			name: string,
+			parameters: {
+				[string]: number | boolean | string,
+			},
+		}
+	}?,
 }
 
 export type Conversation = typeof(setmetatable(

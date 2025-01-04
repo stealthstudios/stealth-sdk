@@ -38,13 +38,29 @@ function wrapper.init(data: WrapperData)
 end
 
 function wrapper.create(
-	personality: Personality & { name: string },
+	config: {
+		personality: Personality & { name: string },
+		functions: { [string]: Function }?,
+	},
 	users: { Player }?,
 	persistenceToken: string?
 ): ConversationData?
+	local functions = {}
+
+	if config.functions then
+		for name, func in config.functions do
+			table.insert(functions, {
+				name = name,
+				description = func.description,
+				parameters = func.parameters,
+			})
+		end
+	end
+
 	local response: Response<ConversationData> = sendRequest(`{wrapperData.url}/api/conversation/create`, "POST", {
 		persistenceToken = persistenceToken,
-		personality = personality,
+		personality = config.personality,
+		functions = functions,
 		users = users and formatUsers(users) or {},
 	}, {
 		Authorization = wrapperData.auth,
@@ -63,20 +79,15 @@ function wrapper.send(
 	message: string,
 	context: { [string]: string }?,
 	player: Player
-): { flagged: boolean, content: string, cancelled: boolean? }?
-	local response: Response<{ flagged: boolean, content: string, cancelled: boolean? }> = sendRequest(
-		`{wrapperData.url}/api/conversation/send`,
-		"POST",
-		{
-			secret = conversation.secret,
-			context = context and formatDictionary(context) or {},
-			message = message,
-			playerId = tostring(player.UserId),
-		},
-		{
-			Authorization = wrapperData.auth,
-		}
-	)
+): SendResponse?
+	local response: Response<SendResponse> = sendRequest(`{wrapperData.url}/api/conversation/send`, "POST", {
+		secret = conversation.secret,
+		context = context and formatDictionary(context) or {},
+		message = message,
+		playerId = tostring(player.UserId),
+	}, {
+		Authorization = wrapperData.auth,
+	})
 
 	if not response.success then
 		warn(
@@ -133,11 +144,36 @@ type ConversationData = {
 	secret: string,
 }
 
+type SendResponse = {
+	flagged: boolean,
+	content: string,
+	cancelled: boolean?,
+	calls: {
+		{
+			name: string,
+			parameters: {
+				[string]: number | boolean | string,
+			},
+		}
+	}?,
+}
+
 export type Personality = {
 	bio: { string },
 	lore: { string },
 	knowledge: { string },
 	messageExamples: { { { user: string, content: string } } },
+}
+
+export type Function = {
+	description: string?,
+	parameters: {
+		{
+			name: string,
+			description: string,
+			type: "string" | "number" | "boolean",
+		}
+	},
 }
 
 export type WrapperData = {

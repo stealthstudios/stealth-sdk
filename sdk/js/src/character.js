@@ -25,10 +25,16 @@ export default class Character {
     conversations;
 
     /**
+     * @param {import('./wrapper.js').Function[]} functions
+     */
+    functions;
+
+    /**
      * @param {Personality} personality
      */
-    constructor(personality, wrapper) {
+    constructor(personality, functions, wrapper) {
         this.personality = personality;
+        this.functions = functions;
         this.#wrapper = wrapper;
         this.conversations = [];
     }
@@ -42,6 +48,7 @@ export default class Character {
     async createConversation(user, persistenceToken) {
         const conversationData = await this.#wrapper.create(
             this.personality,
+            this.functions,
             [user],
             persistenceToken,
         );
@@ -91,6 +98,19 @@ export default class Character {
 
         this.conversations.push(newConversation);
         return newConversation;
+    }
+
+    async executeFunctions(playerId, conversation, response) {
+        if (response && response.calls) {
+            for (const call of response.calls) {
+                const { name, parameters } = call;
+                const func = this.functions[name];
+
+                if (func) {
+                    func.callback(playerId, conversation, parameters);
+                }
+            }
+        }
     }
 
     destroy() {

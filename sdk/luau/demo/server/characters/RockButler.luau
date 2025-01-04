@@ -9,13 +9,13 @@ return engine.createCharacter({
 		personality = {
 			bio = {
 				"Rocky Rockington is a butler for a rich rock family, the Rockingtons.",
-				"Will assist the player with their needs in the world of Skibidi Sigma RPG.",
+				"Will assist the player with their needs in the world of Chatbot SDK RPG.",
 				"Answers in a polite and helpful manner.",
 				"Does not express opinions or beliefs, stating only facts.",
 			},
 			lore = {
 				"Is a butler for a rich rock family, the Rockingtons.",
-				"Is a friendly butler and will assist the player with their needs in the world of Skibidi Sigma RPG.",
+				"Is a friendly butler and will assist the player with their needs in the world of Chatbot SDK RPG.",
 				"Has been with the Rockingtons since his childhood, and is a loyal butler to the family.",
 			},
 			knowledge = {
@@ -60,6 +60,32 @@ return engine.createCharacter({
 			},
 		},
 	},
+	functions = {
+		color = {
+			description = "Changes the color of the baseplate",
+			parameters = {
+				color = {
+					description = 'The color to change to. Can be either "red", "green", or "blue".',
+					type = "string",
+				},
+			},
+			callback = function(
+				player,
+				conversation,
+				data: {
+					color: string,
+				}
+			)
+				if data.color == "red" then
+					game.Workspace.Baseplate.BrickColor = BrickColor.Red()
+				elseif data.color == "green" then
+					game.Workspace.Baseplate.BrickColor = BrickColor.Green()
+				elseif data.color == "blue" then
+					game.Workspace.Baseplate.BrickColor = BrickColor.Blue()
+				end
+			end,
+		},
+	},
 	modelConfig = {
 		interestRadius = 10,
 	},
@@ -78,6 +104,12 @@ return engine.createCharacter({
 
 			if not reply then
 				model:cancelChat(chatId)
+				return
+			end
+
+			if reply.calls then
+				self:executeFunctions(player, reply.calls)
+				model:completeChat(chatId)
 				return
 			end
 

@@ -18,6 +18,7 @@ function character.new(config: Config)
 		config = config.characterConfig,
 		_fullConfig = config,
 		events = config.events,
+		functions = config.functions,
 		models = {},
 	}
 
@@ -38,6 +39,10 @@ function character.update(self: Character)
 			for _, player in state.playerChanges.leave do
 				if self.events.onRadiusLeft then
 					local playerConversation = self:getConversationForPlayer(player)
+
+					if not playerConversation then
+						continue
+					end
 
 					-- we don't wrap this in spawn to prevent a race condition
 					self.events.onRadiusLeft(self, player, playerConversation)
@@ -81,6 +86,27 @@ function character._chat(self: Character, player: Player, message: string)
 		task.spawn(function()
 			self.events.onChatted(self, player, message)
 		end)
+	end
+end
+
+function character.executeFunctions(
+	self: Character,
+	player: Player,
+	functions: {
+		{
+			name: string,
+			parameters: {
+				[string]: number | string | boolean,
+			},
+		}
+	}
+)
+	for _, func in functions do
+		local foundFunction = self.functions[func.name]
+
+		if foundFunction then
+			foundFunction.callback(player, self:getConversationForPlayer(player), func.parameters)
+		end
 	end
 end
 
@@ -142,7 +168,10 @@ function character.createConversation(
 	local personality = table.clone(self.config.personality)
 	personality.name = self.config.name
 
-	local createdConversation = wrapper.create(personality, player and { player } or {}, persistenceToken)
+	local createdConversation = wrapper.create({
+		personality = personality,
+		functions = self.functions :: any, -- this is just pure laziness - i'll revisit this sometime
+	}, player and { player } or {}, persistenceToken)
 	if not createdConversation then
 		return nil
 	end
@@ -202,6 +231,18 @@ type Events = {
 	onConversationEmpty: ((self: Character, conversation: conversation.Conversation) -> ())?,
 }
 
+type Function = {
+	callback: (player: Player, conversation: conversation.Conversation, data: { [string]: any }) -> (),
+	description: string?,
+	parameters: {
+		{
+			name: string,
+			description: string,
+			type: "string" | "number" | "boolean",
+		}
+	},
+}
+
 type CharacterConfig = {
 	name: string?,
 	individualInteractions: boolean?,
@@ -213,11 +254,13 @@ export type Config = {
 	characterConfig: CharacterConfig,
 	modelConfig: characterModel.ModelConfig?,
 	events: Events?,
+	functions: { Function }?,
 }
 
 export type Character = typeof(setmetatable(
 	{} :: {
 		events: Events,
+		functions: { [string]: Function },
 		config: CharacterConfig,
 		_fullConfig: Config,
 		models: { [Model]: characterModel.CharacterModel },

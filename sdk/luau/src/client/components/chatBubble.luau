@@ -21,6 +21,10 @@ local textMap = {
 		text = "⚠️ The response was cancelled.",
 		color = Color3.fromHex("#f59e0b"),
 	},
+	completed = {
+		text = "✅ Action ran!",
+		color = Color3.fromHex("#2e8b49"),
+	},
 }
 
 local function lerp(a: number, b: number, t: number)
