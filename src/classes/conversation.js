@@ -212,8 +212,6 @@ export default class Conversation {
             record.personality.functions,
         );
 
-        console.log(response);
-
         return {
             messages: [
                 { role: "system", content: contextMessage },
