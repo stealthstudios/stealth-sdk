@@ -130,30 +130,39 @@ const response = await conversation.send(
     1,
     "What is my name, and how many wins do I have?",
     {
-        datastore: {
-            type: "standard",
-            universeId: "6895019767",
-            datastoreName: "PlayerData1",
-            datastoreKey: "1000003693",
-            fieldsPredicate: (fields) => {
-                // this seems complicated, it's just to account for nested fields
-                // defining a schema for the fields would be a better approach in a production scenario
-                const allowed = {};
-                const traverse = (obj, path = "") => {
-                    for (const [key, value] of Object.entries(obj)) {
-                        const newPath = path ? `${path}.${key}` : key;
-                        if (key === "Win") {
-                            allowed[newPath] = value;
+        datastores: [
+            {
+                type: "standard",
+                universeId: "1",
+                datastoreName: "DataStore",
+                entryKey: "1",
+                fieldsPredicate: (fields) => {
+                    // this seems complicated, it's just to account for nested fields
+                    // defining a schema for the fields would be a better approach in a production scenario
+                    const allowed = {};
+                    const traverse = (obj, path = "") => {
+                        for (const [key, value] of Object.entries(obj)) {
+                            const newPath = path ? `${path}.${key}` : key;
+                            if (key === "Win") {
+                                allowed[newPath] = value;
+                            }
+                            if (value && typeof value === "object") {
+                                traverse(value, newPath);
+                            }
                         }
-                        if (value && typeof value === "object") {
-                            traverse(value, newPath);
-                        }
-                    }
-                };
-                traverse(fields);
-                return allowed;
+                    };
+                    traverse(fields);
+                    return allowed;
+                },
             },
-        },
+            {
+                type: "ordered",
+                universeId: "1",
+                datastoreName: "DataStore",
+                entryKey: "1",
+                fieldName: "Wins",
+            },
+        ],
         // Context can be provided here. It will be sent as a system message.
         gold: 100,
     },

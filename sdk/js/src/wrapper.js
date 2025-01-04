@@ -3,7 +3,6 @@ import { setConfig } from "openblox/config";
 import {
     StandardDataStoresApi_V2,
     OrderedDataStoresApi_V2,
-    MemoryStoresApi,
 } from "openblox/cloud";
 
 /**
@@ -35,14 +34,13 @@ import {
  */
 
 export default class ConversationWrapper {
-    /** @type {SDKData} */
     #wrapperData = {};
 
-    /**
-     * Formats a dictionary into an array of key-value pairs
-     * @param {Object.<string, string>} dictionary - Dictionary to format
-     * @returns {Array<{key: string, value: string}>}
-     */
+    constructor(data) {
+        this.#wrapperData = data;
+        setConfig({ cloudKey: data.openCloudKey });
+    }
+
     #formatDictionary(dictionary) {
         return Object.entries(dictionary).map(([key, value]) => ({
             key,
@@ -50,97 +48,65 @@ export default class ConversationWrapper {
         }));
     }
 
-    /**
-     * Initializes the wrapper with configuration data
-     * @param {SDKData} data - Configuration data
-     */
-    constructor(data) {
-        this.#wrapperData = data;
-
-        setConfig({
-            cloudKey: data.openCloudKey,
-        });
-    }
-
-    /**
-     * Creates a new conversation
-     * @param {Personality} personality - Personality configuration
-     * @param {Array<{User}>} [users] - Array of users
-     * @param {string} [persistenceToken] - Token for conversation persistence
-     * @returns {Promise<ConversationData|null>}
-     */
-    async create(personality, users, persistenceToken) {
+    async create(personality, users = [], persistenceToken) {
         try {
             const response = await axios.post(
                 `${this.#wrapperData.url}/api/conversation/create`,
-                {
-                    persistenceToken,
-                    personality,
-                    users: users || [],
-                },
-                {
-                    headers: { Authorization: this.#wrapperData.auth },
-                },
+                { persistenceToken, personality, users },
+                { headers: { Authorization: this.#wrapperData.auth } },
             );
 
             if (!response.data) {
-                throw new Error(response);
+                throw new Error("No response data received");
             }
 
             return response.data;
         } catch (error) {
-            console.warn(`Failed to create conversation:`, error.message);
+            console.warn("Failed to create conversation:", error.message);
             return null;
         }
     }
 
-    /**
-     * Sends a message in a conversation
-     * @param {ConversationData} conversation - Conversation data
-     * @param {string} message - Message content
-     * @param {Object.<string, string>} [context] - Additional context
-     * @param {number} id - ID of user sending the message
-     * @returns {Promise<{flagged: boolean, content: string}|null>}
-     */
-    async send(conversation, message, context, id) {
-        if (context.datastore) {
-            const datastoreData = context.datastore;
-            context.datastore = null;
+    async send(conversation, message, context = {}, id) {
+        if (context.datastores) {
+            const datastoresData = context.datastores;
+            delete context.datastores;
 
-            switch (datastoreData.type) {
-                case "standard": {
-                    const { data } =
-                        await StandardDataStoresApi_V2.standardDataStoreEntry({
-                            universeId: datastoreData.universeId,
-                            dataStore: datastoreData.datastoreName,
-                            entryId: datastoreData.datastoreKey,
-                            scope: datastoreData.scope,
-                        });
+            for (const datastoreData of datastoresData) {
+                const params = {
+                    universeId: datastoreData.universeId,
+                    dataStore: datastoreData.datastoreName,
+                    entryId: datastoreData.entryKey,
+                    scope: datastoreData.scope,
+                };
 
-                    if (data) {
-                        let fields = data.value;
-
-                        if (datastoreData.fieldsPredicate) {
-                            fields = datastoreData.fieldsPredicate(fields);
-                        }
-
-                        if (fields) {
-                            // inject fields into context
-                            for (const [key, value] of Object.entries(fields)) {
-                                context[key] = value;
+                try {
+                    if (datastoreData.type === "standard") {
+                        const { data } =
+                            await StandardDataStoresApi_V2.standardDataStoreEntry(
+                                params,
+                            );
+                        if (data?.value) {
+                            let fields = data.value;
+                            if (datastoreData.fieldsPredicate) {
+                                fields = datastoreData.fieldsPredicate(fields);
                             }
+                            Object.assign(context, fields);
+                        }
+                    } else if (datastoreData.type === "ordered") {
+                        const { data } =
+                            await OrderedDataStoresApi_V2.orderedDataStoreEntry(
+                                params,
+                            );
+                        if (data) {
+                            context[data.fieldName] = data.value;
                         }
                     }
-
-                    break;
-                }
-
-                case "ordered": {
-                    break;
-                }
-
-                case "memory": {
-                    break;
+                } catch (error) {
+                    console.warn(
+                        `Failed to fetch ${datastoreData.type} datastore:`,
+                        error.message,
+                    );
                 }
             }
         }
@@ -150,13 +116,13 @@ export default class ConversationWrapper {
                 `${this.#wrapperData.url}/api/conversation/send`,
                 {
                     secret: conversation.secret,
-                    context: context ? this.#formatDictionary(context) : [],
+                    context: Object.keys(context).length
+                        ? this.#formatDictionary(context)
+                        : [],
                     message,
                     playerId: id,
                 },
-                {
-                    headers: { Authorization: this.#wrapperData.auth },
-                },
+                { headers: { Authorization: this.#wrapperData.auth } },
             );
             return response.data;
         } catch (error) {
@@ -168,23 +134,12 @@ export default class ConversationWrapper {
         }
     }
 
-    /**
-     * Updates a conversation
-     * @param {ConversationData} conversation - Conversation to update
-     * @param {Array<{id: string|number, name: string}>} [users] - Updated users
-     * @returns {Promise<boolean>}
-     */
-    async update(conversation, users) {
+    async update(conversation, users = []) {
         try {
             await axios.post(
                 `${this.#wrapperData.url}/api/conversation/update`,
-                {
-                    secret: conversation.secret,
-                    users: users || [],
-                },
-                {
-                    headers: { Authorization: this.#wrapperData.auth },
-                },
+                { secret: conversation.secret, users },
+                { headers: { Authorization: this.#wrapperData.auth } },
             );
             return true;
         } catch (error) {
@@ -196,21 +151,12 @@ export default class ConversationWrapper {
         }
     }
 
-    /**
-     * Finishes a conversation
-     * @param {ConversationData} conversation - Conversation to finish
-     * @returns {Promise<boolean>}
-     */
     async finish(conversation) {
         try {
             await axios.post(
                 `${this.#wrapperData.url}/api/conversation/finish`,
-                {
-                    secret: conversation.secret,
-                },
-                {
-                    headers: { Authorization: this.#wrapperData.auth },
-                },
+                { secret: conversation.secret },
+                { headers: { Authorization: this.#wrapperData.auth } },
             );
             return true;
         } catch (error) {
