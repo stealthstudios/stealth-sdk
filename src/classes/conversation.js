@@ -212,15 +212,18 @@ export default class Conversation {
             record.personality.functions,
         );
 
+        console.log(response);
+
         return {
             messages: [
                 { role: "system", content: contextMessage },
                 { role: "user", content: message, senderId: userId },
-                // Anthropic wants non-empty assistant messages
                 {
                     role: "assistant",
                     content:
-                        response.content.length != 0
+                        response.content.length != 0 &&
+                        // Anthropic wants non-empty assistant messages, otherwise it will return an error
+                        process.env.PROVIDER === "anthropic"
                             ? response.content
                             : "This action was handled via functions.",
                 },
