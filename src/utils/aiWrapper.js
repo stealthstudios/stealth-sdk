@@ -54,8 +54,8 @@ class AIWrapper {
 
                 return response.choices[0]
                     ? {
-                          tool_calls: response.choices[0].tool_calls,
-                          message: response.choices[0].message,
+                          tool_calls: response.choices[0].message.tool_calls,
+                          message: response.choices[0].message.content,
                       }
                     : null;
             }
