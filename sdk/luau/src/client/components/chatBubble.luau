@@ -4,7 +4,7 @@ local fusion = require("@packages/fusion")
 local Children = fusion.Children
 local peek = fusion.peek
 
-local textMap = {
+local STATUS_TEXTS = {
 	started = {
 		text = "⏳ Thinking..",
 		color = Color3.fromHex("#6b7280"),
@@ -27,11 +27,24 @@ local textMap = {
 	},
 }
 
-local function lerp(a: number, b: number, t: number)
+local DEFAULT_FONT =
+	Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal)
+
+local function lerp(a: number, b: number, t: number): number
 	return a + (b - a) * t
 end
 
-local function chatBubble(props: Props)
+local function getTextBounds(text: string): Vector2
+	local params = Instance.new("GetTextBoundsParams")
+	params.Font = DEFAULT_FONT
+	params.Text = text
+	params.Size = 20
+	params.Width = 256
+	params.RichText = true
+	return TextService:GetTextBoundsAsync(params)
+end
+
+local function chatBubble(props: props)
 	local scope = props.chat.scope
 	local status = props.chat.status
 	local isOpen = props.chat.isOpen
@@ -49,23 +62,23 @@ local function chatBubble(props: Props)
 			return content
 		end
 
-		return textMap[use(currentStatus)].text
+		return STATUS_TEXTS[use(currentStatus)].text
 	end)
 
 	local color = scope:Computed(function(use)
-		return textMap[use(status)].color
+		return STATUS_TEXTS[use(status)].color
 	end)
 
-	-- Returns a value between 0-1 representing chat bubble visibility based on distance
 	local isVisible = scope:Computed(function(use)
 		local distance = use(props.adorneeDistance) * props.distanceMultiplier
 		local isCurrentlyOpen = use(isOpen)
+		local isTransparent = use(props.transparent)
 
 		if not isCurrentlyOpen then
 			return 1
 		end
 
-		if distance >= 100 then
+		if distance >= 100 or isTransparent then
 			return 1
 		end
 
@@ -76,20 +89,10 @@ local function chatBubble(props: Props)
 		return 0
 	end)
 
-	local textSize = scope:Value(Vector2.new(0, 0))
+	local textSize = scope:Value(Vector2.zero)
 
 	local function updateTextSize()
-		local newText = peek(text)
-		local params = Instance.new("GetTextBoundsParams")
-		params.Font =
-			Font.new("rbxasset://fonts/families/BuilderSans.json", Enum.FontWeight.Medium, Enum.FontStyle.Normal)
-		params.Text = newText
-		params.Size = 20
-		params.Width = 256
-		params.RichText = true
-
-		local bounds = TextService:GetTextBoundsAsync(params)
-		textSize:set(bounds)
+		textSize:set(getTextBounds(peek(text)))
 	end
 
 	table.insert(scope, scope:Observer(text):onChange(updateTextSize))
@@ -146,11 +149,7 @@ local function chatBubble(props: Props)
 						AnchorPoint = Vector2.new(0.5, 0.5),
 						AutoLocalize = false,
 						BackgroundTransparency = 1,
-						FontFace = Font.new(
-							"rbxasset://fonts/families/BuilderSans.json",
-							Enum.FontWeight.Medium,
-							Enum.FontStyle.Normal
-						),
+						FontFace = DEFAULT_FONT,
 						LayoutOrder = 2,
 						Position = UDim2.fromScale(0.5, 0.5),
 						RichText = true,
@@ -223,11 +222,12 @@ export type Chat = {
 	isOpen: fusion.Value<fusion.Scope<typeof(fusion)>, boolean>,
 }
 
-type Props = {
+type props = {
 	chat: Chat & {
 		scope: fusion.Scope<typeof(fusion)>,
 	},
 	caretEnabled: fusion.Value<fusion.Scope<typeof(fusion)>, boolean>,
+	transparent: fusion.Value<fusion.Scope<typeof(fusion)>, boolean>,
 	layoutOrder: number,
 	adorneeDistance: fusion.Value<fusion.Scope<typeof(fusion)>, number>,
 	distanceMultiplier: number,

@@ -3,13 +3,11 @@ local Children = fusion.Children
 
 local chatBubble = require("@client/components/chatBubble")
 
-local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: props): BillboardGui
+local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: props): Instance
 	local adorneeDistance = scope:Value(0)
 
 	local function updateAdorneeDistance()
-		-- we have to re-fetch camera each time; it could change!
 		local camera = workspace.CurrentCamera
-
 		if not camera then
 			return
 		end
@@ -21,7 +19,7 @@ local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: p
 	table.insert(scope, workspace.CurrentCamera:GetPropertyChangedSignal("CFrame"):Connect(updateAdorneeDistance))
 	table.insert(scope, props.adornee:GetPropertyChangedSignal("CFrame"):Connect(updateAdorneeDistance))
 
-	local billboardGui = scope:New("BillboardGui")({
+	return scope:New("BillboardGui")({
 		Adornee = props.adornee,
 		Size = UDim2.fromOffset(500, 200),
 		SizeOffset = Vector2.new(0, 0.5),
@@ -33,7 +31,6 @@ local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: p
 				Name = "BubbleChatList",
 				BackgroundTransparency = 1,
 				Size = UDim2.fromScale(1, 1),
-
 				[Children] = {
 					scope:New("UIPadding")({
 						Name = "CaretPadding",
@@ -49,13 +46,18 @@ local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: p
 					}),
 
 					scope:ForPairs(props.chats, function(_, forPairsScope, index, chat)
-						-- we want to allow other values to use this scope, so we expose it like this
 						chat.scope = forPairsScope
+
+						print(index, chat)
 
 						return index,
 							chatBubble({
 								layoutOrder = index,
 								chat = chat,
+								transparent = forPairsScope:Computed(function(use)
+									-- transparent if the current chat is more than 3 chats away from the last chat
+									return index <= #use(props.chats) - 3
+								end),
 								caretEnabled = forPairsScope:Computed(function(use)
 									return index == #use(props.chats)
 								end),
@@ -67,8 +69,6 @@ local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: p
 			}),
 		},
 	})
-
-	return billboardGui
 end
 
 type props = {

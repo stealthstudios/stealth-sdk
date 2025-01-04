@@ -9,20 +9,11 @@ local peek = fusion.peek
 local chatBubble = require("@client/components/chatBubble")
 local chatBubbleContainer = require("@client/components/chatBubbleContainer")
 
-local managedGuis: {
-	[Model]: ManagedGui,
-} = {}
-
-local mappedIds: {
-	[string]: {
-		managedGui: ManagedGui,
-		chat: chatBubble.Chat?,
-	},
-} = {}
+local managedGuis: { [Model]: ManagedGui } = {}
+local mappedIds: { [string]: { managedGui: ManagedGui, chat: chatBubble.Chat? } } = {}
 
 function chatBubbleManager.new(id: string, model: Model): ManagedGui
 	if managedGuis[model] then
-		-- chat is assigned in chatStarted.luau
 		mappedIds[id] = {
 			managedGui = managedGuis[model],
 		}
@@ -52,6 +43,10 @@ function chatBubbleManager.new(id: string, model: Model): ManagedGui
 		model = model,
 		scope = scope,
 		chats = value,
+		-- fusion does some optimization with tables to ensure all indices are used, however,
+		-- we use the index for the layoutorder and several other factors and as such it is important this does not happen
+		-- so we keep track of the index ourselves
+		chatIndex = 0,
 	}
 
 	mappedIds[id] = {
@@ -67,16 +62,12 @@ function chatBubbleManager.new(id: string, model: Model): ManagedGui
 	return managedGuis[model]
 end
 
-function chatBubbleManager.get(id: string): {
-	managedGui: ManagedGui,
-	chat: chatBubble.Chat?,
-}
+function chatBubbleManager.get(id: string): { managedGui: ManagedGui, chat: chatBubble.Chat? }
 	return mappedIds[id]
 end
 
 function chatBubbleManager.remove(id: string)
 	local managedGuiData = mappedIds[id]
-
 	if not managedGuiData then
 		return
 	end
@@ -87,7 +78,6 @@ function chatBubbleManager.remove(id: string)
 		doCleanup(managedGuiData.chat)
 
 		local newChats = peek(managedGuiData.managedGui.chats)
-
 		for i, chat in newChats do
 			if chat.id == id then
 				newChats[i] = nil
@@ -104,6 +94,7 @@ type ManagedGui = {
 	model: Model,
 	scope: fusion.Scope<typeof(fusion)>,
 	chats: fusion.Value<fusion.Scope<typeof(fusion)>, { chatBubble.Chat }>,
+	chatIndex: number,
 }
 
 return chatBubbleManager

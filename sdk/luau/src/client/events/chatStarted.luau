@@ -22,6 +22,7 @@ return function(data: {
 	mappedId.chat = newChat
 
 	local newChats = peek(chats)
-	table.insert(newChats, newChat)
+	managedGui.chatIndex += 1
+	newChats[managedGui.chatIndex] = newChat
 	chats:set(newChats)
 end
