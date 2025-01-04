@@ -33,8 +33,7 @@ async function startServer() {
         cascadeHooks: true,
     });
 
-    // Start server
-    const port = process.env.DEV_SERVER_PORT || 3000;
+    const port = process.env.SERVER_PORT || 3000;
 
     server.listen({ port, host: "0.0.0.0" });
     logger.info(`Server is running on port ${port}`);

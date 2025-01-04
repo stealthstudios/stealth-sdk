@@ -25,7 +25,7 @@ This application consists of a backend that provides the underlying logic for tr
 
 Developers can then use the SDKs to interact with this backend, and build their own chatbot applications on top of it. The current SDKs are:
 
-- Luau (Roblox)
+- [Luau (Roblox)](./sdk/luau/)
 - [JavaScript](./sdk/js/)
 
 ### Installation
@@ -40,10 +40,16 @@ npm install
 
 When using this application, you need to set the following environment variables:
 
-- `SERVER_PORT`: The port to run the server on.
+- `SERVER_PORT`: The port to run the app on.
 - `OPENAI_API_KEY`: The API key to use for the OpenAI API.
 - `ENDPOINT_API_KEY`: The authentication key that all incoming requests must provide.
 - `ENVIRONMENT`: The environment to run the server in. This should be set to `development` or `production`. In a development environment, certain security features are disabled to make development easier. The Scalar API key (in the API reference) is for example filled in automatically.
+- `POSTGRES_USER`: The username to use for the PostgreSQL database.
+- `POSTGRES_PASSWORD`: The password to use for the PostgreSQL database.
+- `POSTGRES_HOST`: The host to use for the PostgreSQL database.
+- `POSTGRES_PORT`: The port to use for the PostgreSQL database.
+- `POSTGRES_DB`: The database to use for the PostgreSQL database.
+- `DATABASE_URL`: In order to dynamically fill in database details, the database URL should be set. This should generally be `"postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public"`. This is then sent to Prisma to connect to the database.
 
 ## Running the application
 

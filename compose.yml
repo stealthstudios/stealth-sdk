@@ -22,18 +22,18 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        DEV_SERVER_PORT: ${DEV_SERVER_PORT}
+      - SERVER_PORT=${SERVER_PORT}
     volumes:
       - ./logs/:/app/logs/
     working_dir: /app
     environment:
       # We selectively expose env variables to the container to make sure that it can never launch in a development environment on Docker
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
-      - DEV_SERVER_PORT=${DEV_SERVER_PORT}
+      - SERVER_PORT=${SERVER_PORT}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ENDPOINT_API_KEY=${ENDPOINT_API_KEY}
     ports:
-      - "${SERVER_PORT}:3000"
+      - "${SERVER_PORT}:${SERVER_PORT}"
     networks:
       - app-network
 
