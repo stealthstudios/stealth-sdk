@@ -77,11 +77,12 @@ function character.update(self: Character)
 end
 
 function character._chat(self: Character, player: Player, message: string)
-	if not rateLimit(player) then
+	local playerConversation = self:getConversationForPlayer(player)
+
+	if not rateLimit(playerConversation.id) then
 		return
 	end
 
-	local playerConversation = self:getConversationForPlayer(player)
 	if playerConversation and self.events.onChatted then
 		task.spawn(function()
 			self.events.onChatted(self, player, message)
