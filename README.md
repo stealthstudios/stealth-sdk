@@ -9,15 +9,15 @@
 ## Table of Contents
 
 - [chatbot-backend](#chatbot-backend)
-  - [Table of Contents](#table-of-contents)
-  - [Usage](#usage)
-    - [Installation](#installation)
-    - [Environment Variables](#environment-variables)
-  - [Running the application](#running-the-application)
-    - [Development](#development)
-    - [Production](#production)
-    - [Docker](#docker)
-  - [Endpoint Documentation](#endpoint-documentation)
+    - [Table of Contents](#table-of-contents)
+    - [Usage](#usage)
+        - [Installation](#installation)
+        - [Environment Variables](#environment-variables)
+    - [Running the application](#running-the-application)
+        - [Development](#development)
+        - [Production](#production)
+        - [Docker](#docker)
+    - [Endpoint Documentation](#endpoint-documentation)
 
 ## Usage
 
@@ -26,6 +26,7 @@ This application consists of a backend that provides the underlying logic for tr
 Developers can then use the SDKs to interact with this backend, and build their own chatbot applications on top of it. The current SDKs are:
 
 - Luau (Roblox)
+- [JavaScript](./sdk/js/)
 
 ### Installation
 
