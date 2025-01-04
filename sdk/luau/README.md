@@ -9,12 +9,12 @@
 ## Table of Contents
 
 - [chatbot-sdk-luau](#chatbot-sdk-luau)
-    - [Table of Contents](#table-of-contents)
-    - [Setup](#setup)
-        - [Development](#development)
-    - [Character Format](#character-format)
-    - [Adding NPCs](#adding-npcs)
-        - [Configuring NPCs](#configuring-npcs)
+  - [Table of Contents](#table-of-contents)
+  - [Setup](#setup)
+    - [Development](#development)
+  - [Character Format](#character-format)
+  - [Adding NPCs](#adding-npcs)
+    - [Configuring NPCs](#configuring-npcs)
 
 ## Setup
 
@@ -208,3 +208,7 @@ NPCs feature a few customization options to improve the experience, applied via 
 
 - `BubbleOffset` (number): the vertical offset of the bubble from the NPC's PrimaryPart in world space, in studs.
 - `BubbleDistanceMultiplier` (number): The distance multiplier for the bubble fade effect. If this is below 1, the distance it takes for a bubble to start fading will increase. This is useful for interactions in large ranges, as bubbles will normally start fading out at 30 studs.
+- `ShowMessagesInChat` (boolean): If true, messages from this NPC will be shown in the chat. If false, they will only be shown in the bubble.
+- `ChatChannelName` (string): The name of the chat channel to use for messages from this NPC. **Must be provided if `ShowMessagesInChat` is true.**
+- `MessageMarkup` (string): Rich text markup used to format messages from this NPC. This can be used to apply custom formatting to messages, such as colors, bold text, and more. Is used with string.format and should contain a single `%s` to insert the message content. Example: `<b>%s</b>`.
+- `NameMarkup` (string): Rich text markup used to format the NPC's name. This can be used to apply custom formatting to the NPC's name, such as colors, bold text, and more. Is used with string.format and should contain a single `%s` to insert the NPC's name. Example: `<b>%s: </b>`. The default value is `%s: `. Keep in mind that spaces at the end of the markup will be normalized in attribute fields, so consider wrapping these in a rich text tag to retain them.
