@@ -72,7 +72,7 @@ model Personality {
   name String
 
   prompt    String?
-  functions Json
+  functions Json?
 
   conversations Conversation[]
 

@@ -21,7 +21,7 @@
 
 ## Usage
 
-This application consists of a backend that provides the underlying logic for tracking conversations and sending requests to the OpenAI API. It is built using Node.js and Fastify, using PostgreSQL as a database.
+This application consists of a backend that provides the underlying logic for tracking conversations and sending requests to the API of several providers. It is built using Node.js and Fastify, using PostgreSQL as a database.
 
 Developers can then use the SDKs to interact with this backend, and build their own chatbot applications on top of it. The current SDKs are:
 
@@ -40,8 +40,9 @@ npm install
 
 When using this application, you need to set the following environment variables:
 
+- `PROVIDER`: `anthropic` (Claude 3.5), `deepseekv3` or `openai` (GPT4).
+- `AI_API_KEY`: The API key to pass to the model's API.
 - `SERVER_PORT`: The port to run the app on.
-- `OPENAI_API_KEY`: The API key to use for the OpenAI API.
 - `ENDPOINT_API_KEY`: The authentication key that all incoming requests must provide.
 - `ENVIRONMENT`: The environment to run the server in. This should be set to `development` or `production`. In a development environment, certain security features are disabled to make development easier. The Scalar API key (in the API reference) is for example filled in automatically.
 - `POSTGRES_USER`: The username to use for the PostgreSQL database.

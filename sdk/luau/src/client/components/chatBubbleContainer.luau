@@ -48,8 +48,6 @@ local function chatBubbleContainer(scope: fusion.Scope<typeof(fusion)>, props: p
 					scope:ForPairs(props.chats, function(_, forPairsScope, index, chat)
 						chat.scope = forPairsScope
 
-						print(index, chat)
-
 						return index,
 							chatBubble({
 								layoutOrder = index,

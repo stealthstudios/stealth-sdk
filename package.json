@@ -10,7 +10,7 @@
         "#classes/*": "./src/classes/*"
     },
     "scripts": {
-        "deploy": "npx prisma migrate dev --name init && node src/index.js",
+        "deploy": "npx prisma db push && npx prisma generate && npx prisma migrate deploy && node src/index.js",
         "dev": "nodemon index.js --watch src",
         "lint": "eslint \"./src/**/*.js\" --config ./eslint.config.mjs",
         "format": "prettier --write \"./src/**/*.js\"",
@@ -27,6 +27,7 @@
         "prisma": "^6.0.1"
     },
     "dependencies": {
+        "@anthropic-ai/sdk": "^0.33.1",
         "@fastify/autoload": "^6.0.3",
         "@fastify/cors": "^10.0.1",
         "@fastify/swagger": "^9.4.0",

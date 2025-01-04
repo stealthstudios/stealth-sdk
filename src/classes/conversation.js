@@ -1,6 +1,6 @@
 import prismaClient from "#utils/prisma.js";
 import { getEncoding } from "js-tiktoken";
-import { openaiClient } from "#utils/openai.js";
+import aiWrapper from "#utils/aiWrapper.js";
 import logger from "#utils/logger.js";
 
 export default class Conversation {
@@ -19,8 +19,6 @@ export default class Conversation {
     /** @type {number|null} ID of the personality associated with this conversation */
     personalityId;
 
-    functions;
-
     /**
      * @param {object} conversation Prisma conversation object
      */
@@ -32,12 +30,15 @@ export default class Conversation {
         this.personalityId = conversation.personalityId;
     }
 
+    /**
+     * Checks if conversation exists in database
+     */
     async exists() {
-        return (
-            (await prismaClient.conversation.findUnique({
-                where: { id: this.id },
-            })) !== null
-        );
+        const conversation = await prismaClient.conversation.findUnique({
+            where: { id: this.id },
+        });
+
+        return conversation !== null;
     }
 
     /**
@@ -68,6 +69,9 @@ export default class Conversation {
                 },
             });
         } catch (error) {
+            logger.error(
+                "An error occured while updating conversation users. This is a non-critical error, it generally just means that the conversation or user was deleted before this function was ran. Error:",
+            );
             logger.error(error);
         }
     }
@@ -110,12 +114,12 @@ export default class Conversation {
      * @returns {Promise<{flagged: boolean, content: string, cancelled?: boolean}|null>}
      */
     async send(message, context, userId) {
-        const { busy } = await prismaClient.conversation.findUnique({
+        const conversation = await prismaClient.conversation.findUnique({
             where: { id: this.id },
             select: { busy: true },
         });
 
-        if (busy) return null;
+        if (conversation.busy) return null;
 
         await this.setBusyState(true);
 
@@ -130,7 +134,7 @@ export default class Conversation {
                 await this.saveMessages(messages, context);
             } catch (err) {
                 logger.error(
-                    "An error occured while saving messages to the database. This generally means that the conversation has finished while awaiting a response from the AI. This is not a critical error. The error is listed below.",
+                    "Error saving messages to database. Conversation likely finished while awaiting AI response. Non-critical error:",
                 );
                 logger.error(err);
 
@@ -192,12 +196,13 @@ export default class Conversation {
         );
 
         const username = record.users.find((user) => user.id === userId).name;
+        const totalTokens =
+            tokenCount +
+            encoding.encode(record.personality.prompt).length +
+            encoding.encode(message).length;
+
         logger.debug(
-            `${username} (${userId}) sent a message to conversation ${this.id} (total tokens: ${
-                tokenCount +
-                encoding.encode(record.personality.prompt).length +
-                encoding.encode(message).length
-            })`,
+            `${username} (${userId}) sent message to conversation ${this.id} (total tokens: ${totalTokens})`,
         );
 
         const response = await this.getAIResponse(
@@ -211,7 +216,14 @@ export default class Conversation {
             messages: [
                 { role: "system", content: contextMessage },
                 { role: "user", content: message, senderId: userId },
-                { role: "assistant", content: response.content },
+                // Anthropic wants non-empty assistant messages
+                {
+                    role: "assistant",
+                    content:
+                        response.content.length != 0
+                            ? response.content
+                            : "This action was handled via functions.",
+                },
             ],
             response: {
                 flagged: response.flagged,
@@ -291,8 +303,8 @@ export default class Conversation {
     async getAIResponse(messages, userMessage, userId, functions) {
         let tools = [];
 
-        for (const func of functions) {
-            tools.push({
+        if (functions) {
+            tools = functions.map((func) => ({
                 type: "function",
                 function: {
                     name: func.name,
@@ -302,47 +314,60 @@ export default class Conversation {
                         properties: func.parameters,
                     },
                 },
-            });
+            }));
         }
 
-        const rawResponse = await openaiClient.chat.completions.create({
-            model: "gpt-4o",
-            messages: messages,
-            tools: tools,
-        });
+        let systemMessage;
 
-        if (rawResponse.choices[0].message.tool_calls) {
+        if (process.env.PROVIDER === "anthropic") {
+            const systemMessages = messages.filter(
+                (msg) => msg.role === "system",
+            );
+            const contextMessages = systemMessages.filter((msg) =>
+                msg.content.startsWith("# Context"),
+            );
+            const lastContextMessage =
+                contextMessages[contextMessages.length - 1]?.content || "";
+
+            systemMessage = `${systemMessages[0].content}\n\n${lastContextMessage}`;
+            messages = messages.filter((msg) => msg.role !== "system");
+        }
+
+        const response = await aiWrapper.query(
+            messages,
+            tools.length > 0 ? tools : null,
+            systemMessage,
+        );
+
+        if (!response) {
+            throw new Error("No response from AI Provider");
+        }
+
+        if (response.tool_calls) {
             logger.debug(
-                `Got ${rawResponse.choices[0].message.tool_calls.length} tool calls from last message response`,
+                `Got ${response.tool_calls.length} tool calls from last message response`,
             );
 
             return {
                 flagged: false,
                 content: "",
-                calls: rawResponse.choices[0].message.tool_calls.map(
-                    (call) => ({
-                        name: call.function.name,
-                        parameters: JSON.parse(call.function.arguments),
-                    }),
-                ),
+                calls: response.tool_calls.map((call) => ({
+                    name: call.function.name,
+                    parameters: JSON.parse(call.function.arguments),
+                })),
             };
         }
-
-        const response = rawResponse.choices[0].message;
-        if (!response) throw new Error("No response from OpenAI");
 
         const moderationResult = await this.moderateContent(
             userMessage,
             userId,
-            response.content,
+            response.message,
         );
-
-        // trim newlines after the response - sometimes it comes with these and it makes the bubbles ugly
-        const content = response.content.replace(/\n+$/, "");
+        const content = response.message.replace(/\n+$/, "");
 
         return {
             flagged: moderationResult.flagged,
-            content: content,
+            content,
         };
     }
 
@@ -351,14 +376,12 @@ export default class Conversation {
      * @private
      */
     async moderateContent(userMessage, userId, responseContent) {
-        const moderationResponseRaw = await openaiClient.moderations.create({
-            input: `${userMessage} ${responseContent}`,
-            model: "omni-moderation-latest",
-        });
+        const moderationResponse = await aiWrapper.moderate(
+            `${userMessage} ${responseContent}`,
+        );
 
-        const moderationResponse = moderationResponseRaw.results[0];
         if (!moderationResponse) {
-            throw new Error("No moderation response from OpenAI");
+            throw new Error("No moderation response from AI Provider");
         }
 
         if (moderationResponse.flagged) {
@@ -381,10 +404,12 @@ export default class Conversation {
      */
     async saveMessages(messages, context) {
         const createdMessages = await prismaClient.message.createManyAndReturn({
-            data: messages.map((msg) => ({
-                ...msg,
-                conversationId: this.id,
-            })),
+            data: messages
+                .filter((msg) => msg != null)
+                .map((msg) => ({
+                    ...msg,
+                    conversationId: this.id,
+                })),
         });
 
         if (!context?.length) return;

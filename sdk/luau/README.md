@@ -9,12 +9,12 @@
 ## Table of Contents
 
 - [chatbot-sdk-luau](#chatbot-sdk-luau)
-  - [Table of Contents](#table-of-contents)
-  - [Setup](#setup)
-    - [Development](#development)
-  - [Character Format](#character-format)
-  - [Adding NPCs](#adding-npcs)
-    - [Configuring NPCs](#configuring-npcs)
+    - [Table of Contents](#table-of-contents)
+    - [Setup](#setup)
+        - [Development](#development)
+    - [Character Format](#character-format)
+    - [Adding NPCs](#adding-npcs)
+        - [Configuring NPCs](#configuring-npcs)
 
 ## Setup
 
@@ -113,7 +113,7 @@ An example character is provided below:
             },
         },
     },
-    -- OpenAI functions to be passed to the backend.
+    -- Functions to be passed to the backend.
     functions = {
 		color = {
             -- What does this function do, when should it be called?
@@ -200,7 +200,7 @@ An example character is provided below:
                 return
             end
 
-            -- OpenAI's moderation model flagged the message or response.
+            -- AI moderation model flagged the message or response.
             if reply.flagged then
                 model:flagChat(chatId)
                 return

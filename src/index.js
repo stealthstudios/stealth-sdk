@@ -5,7 +5,7 @@ import fastifyAutoload from "@fastify/autoload";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
-const REQUIRED_ENV_VARS = ["OPENAI_API_KEY", "ENDPOINT_API_KEY"];
+const REQUIRED_ENV_VARS = ["AI_API_KEY", "ENDPOINT_API_KEY", "PROVIDER"];
 
 async function startServer() {
     // Validate environment variables

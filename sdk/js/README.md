@@ -172,7 +172,7 @@ const response = await conversation.send(
 
 ## Functions
 
-This SDK can leverage OpenAI functions to not just converse with the AI, but also have it perform actions within the context of your game. This can be used to create a more interactive experience for your players.
+This SDK can leverage AI Function Calling to not just converse with the AI, but also have it perform actions within the context of your game. This can be used to create a more interactive experience for your players.
 
 An example of using functions can be seen below:
 
