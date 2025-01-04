@@ -15,6 +15,7 @@ return function(data: {
 		status = managedGui.scope:Value("started"),
 		content = managedGui.scope:Value(nil),
 		isOpen = managedGui.scope:Value(false),
+		active = true,
 	}
 
 	local mappedId = chatBubbleManager.get(data.chatId)

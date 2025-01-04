@@ -63,8 +63,8 @@ function wrapper.send(
 	message: string,
 	context: { [string]: string }?,
 	player: Player
-): { flagged: boolean, content: string }?
-	local response: Response<{ flagged: boolean, content: string }> = sendRequest(
+): { flagged: boolean, content: string, cancelled: boolean? }?
+	local response: Response<{ flagged: boolean, content: string, cancelled: boolean? }> = sendRequest(
 		`{wrapperData.url}/api/conversation/send`,
 		"POST",
 		{

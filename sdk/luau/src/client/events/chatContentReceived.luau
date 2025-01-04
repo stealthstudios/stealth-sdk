@@ -3,7 +3,7 @@ local constants = require("@src/constants")
 return function(chatId: string, content: string)
 	local managedGui = chatBubbleManager.get(chatId)
 
-	if not managedGui then
+	if not managedGui or not managedGui.chat.active then
 		return
 	end
 

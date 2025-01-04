@@ -155,6 +155,23 @@ function characterModel.cleanChat(self: CharacterModel, chatId: string)
 	self._chats[chatId] = nil
 end
 
+function characterModel.cancelChats(self: CharacterModel, target: conversation.Conversation)
+	for chatId, chatConversation: conversation.Conversation in self._chats do
+		if chatConversation == target then
+			self:cancelChat(chatId)
+		end
+	end
+end
+
+function characterModel.cancelChatsForPlayer(self: CharacterModel, player: Player, target: conversation.Conversation)
+	for chatId, chatConversation: conversation.Conversation in self._chats do
+		if chatConversation == target then
+			-- send cancel payload to only that player
+			communication.sendToPlayer(player, "chatCancelled", chatId)
+		end
+	end
+end
+
 type UpdateState = {
 	playerChanges: {
 		enter: { Player },

@@ -213,6 +213,7 @@ end
 
 export type Chat = {
 	id: string,
+	active: boolean,
 	status: fusion.Value<fusion.Scope<typeof(fusion)>, string>,
 	content: fusion.Value<fusion.Scope<typeof(fusion)>, string>,
 	isOpen: fusion.Value<fusion.Scope<typeof(fusion)>, boolean>,

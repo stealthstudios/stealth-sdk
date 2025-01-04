@@ -36,6 +36,7 @@ export default async function (app) {
                         type: "object",
                         properties: {
                             flagged: { type: "boolean" },
+                            cancelled: { type: "boolean" },
                             content: { type: "string" },
                         },
                     },
@@ -87,10 +88,11 @@ export default async function (app) {
                     context,
                     playerId,
                 );
+
                 if (!response) {
-                    return reply
-                        .code(429)
-                        .send({ message: "Conversation is busy" });
+                    return reply.code(429).send({
+                        message: "Conversation is busy or no longer exists",
+                    });
                 }
 
                 return reply.code(200).send(response);

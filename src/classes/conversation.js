@@ -30,6 +30,14 @@ export default class Conversation {
         this.personalityId = conversation.personalityId;
     }
 
+    async exists() {
+        return (
+            (await prismaClient.conversation.findUnique({
+                where: { id: this.id },
+            })) !== null
+        );
+    }
+
     /**
      * Updates conversation users
      * @param {{users: Array<{id: string, name: string}>}} data Update data containing users
@@ -97,7 +105,7 @@ export default class Conversation {
      * @param {string} message Message content
      * @param {Array<{key: string, value: string}>} context Additional context
      * @param {string} userId ID of sending user
-     * @returns {Promise<{flagged: boolean, content: string}|null>}
+     * @returns {Promise<{flagged: boolean, content: string, cancelled?: boolean}|null>}
      */
     async send(message, context, userId) {
         const { busy } = await prismaClient.conversation.findUnique({
@@ -116,13 +124,35 @@ export default class Conversation {
                 userId,
             );
 
-            await this.saveMessages(messages, context);
+            try {
+                await this.saveMessages(messages, context);
+            } catch (err) {
+                logger.error(
+                    "An error occured while saving messages to the database. This generally means that the conversation has finished while awaiting a response from the AI. This is not a critical error. The error is listed below.",
+                );
+                logger.error(err);
+
+                return {
+                    flagged: false,
+                    cancelled: true,
+                    content: "",
+                };
+            }
+
             return response;
         } catch (error) {
-            logger.error(error);
+            logger.warn(error);
         } finally {
-            await this.setBusyState(false);
+            if (await this.exists()) {
+                await this.setBusyState(false);
+            }
         }
+
+        return {
+            flagged: false,
+            cancelled: true,
+            content: "",
+        };
     }
 
     /**

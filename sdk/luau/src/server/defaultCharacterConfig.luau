@@ -88,6 +88,11 @@ local defaultCharacterConfig: character.Config = {
 				return
 			end
 
+			if reply.cancelled then
+				model:cancelChat(chatId)
+				return
+			end
+
 			if reply.flagged then
 				model:flagChat(chatId)
 				return

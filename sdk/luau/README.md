@@ -157,6 +157,12 @@ An example character is provided below:
                 return
             end
 
+            -- The player left the radius while the model was processing the message or there was another reason why the chat could not be completed.
+            if reply.cancelled then
+                model:cancelChat(chatId)
+                return
+            end
+
             -- OpenAI's moderation model flagged the message or response.
             if reply.flagged then
                 model:flagChat(chatId)

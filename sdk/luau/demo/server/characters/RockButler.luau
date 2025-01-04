@@ -75,7 +75,13 @@ return engine.createCharacter({
 			local reply = conversation:send(player, message, {
 				gold = 1000,
 			})
+
 			if not reply then
+				model:cancelChat(chatId)
+				return
+			end
+
+			if reply.cancelled then
 				model:cancelChat(chatId)
 				return
 			end

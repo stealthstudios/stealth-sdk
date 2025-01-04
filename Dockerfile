@@ -1,4 +1,4 @@
-ARG DEV_SERVER_PORT=3000
+ARG SERVER_PORT=3000
 
 FROM node:20
 
@@ -10,4 +10,4 @@ RUN npm install
 
 COPY . .
 CMD ["npm", "run", "deploy"]
-EXPOSE ${DEV_SERVER_PORT}
+EXPOSE ${SERVER_PORT}

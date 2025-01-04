@@ -38,9 +38,13 @@ function character.update(self: Character)
 			for _, player in state.playerChanges.leave do
 				if self.events.onRadiusLeft then
 					local playerConversation = self:getConversationForPlayer(player)
-					task.spawn(function()
-						self.events.onRadiusLeft(self, player, playerConversation)
-					end)
+
+					-- we don't wrap this in spawn to prevent a race condition
+					self.events.onRadiusLeft(self, player, playerConversation)
+
+					if not table.find(playerConversation.partakingPlayers, player) then
+						model:cancelChatsForPlayer(player, playerConversation)
+					end
 				end
 			end
 		end
@@ -157,10 +161,13 @@ function character.createConversation(
 end
 
 function character.finishConversation(self: Character, target: conversation.Conversation, yieldCallback: boolean?)
+	local containingModel
+
 	for _, model: characterModel.CharacterModel in self.models do
 		local index = table.find(model.conversations, target)
 
 		if index then
+			containingModel = model
 			table.remove(model.conversations, index)
 		end
 	end
@@ -170,12 +177,18 @@ function character.finishConversation(self: Character, target: conversation.Conv
 			if self.events.onConversationFinish then
 				self.events.onConversationFinish(self, target)
 			end
+
+			containingModel:cancelChats(target)
+
 			target:finish()
 		end)
 	else
 		if self.events.onConversationFinish then
 			self.events.onConversationFinish(self, target)
 		end
+
+		containingModel:cancelChats(target)
+
 		target:finish()
 	end
 end
