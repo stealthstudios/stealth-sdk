@@ -64,9 +64,17 @@ return engine.createCharacter({
 		color = {
 			description = "Changes the color of the baseplate",
 			parameters = {
-				color = {
-					description = 'The color to change to. Can be either "red", "green", or "blue".',
-					type = "string",
+				r = {
+					description = "The R component of the color to change to",
+					type = "number",
+				},
+				g = {
+					description = "The G component of the color to change to",
+					type = "number",
+				},
+				b = {
+					description = "The B component of the color to change to",
+					type = "number",
 				},
 			},
 			callback = function(
@@ -76,13 +84,7 @@ return engine.createCharacter({
 					color: string,
 				}
 			)
-				if data.color == "red" then
-					game.Workspace.Baseplate.BrickColor = BrickColor.Red()
-				elseif data.color == "green" then
-					game.Workspace.Baseplate.BrickColor = BrickColor.Green()
-				elseif data.color == "blue" then
-					game.Workspace.Baseplate.BrickColor = BrickColor.Blue()
-				end
+				game.Workspace.Baseplate.Color = Color3.fromRGB(data.r, data.g, data.b)
 			end,
 		},
 	},
