@@ -9,12 +9,12 @@
 ## Table of Contents
 
 - [chatbot-sdk-luau](#chatbot-sdk-luau)
-    - [Table of Contents](#table-of-contents)
-    - [Setup](#setup)
-        - [Development](#development)
-    - [Character Format](#character-format)
-    - [Adding NPCs](#adding-npcs)
-        - [Configuring NPCs](#configuring-npcs)
+  - [Table of Contents](#table-of-contents)
+  - [Setup](#setup)
+    - [Development](#development)
+  - [Character Format](#character-format)
+  - [Adding NPCs](#adding-npcs)
+    - [Configuring NPCs](#configuring-npcs)
 
 ## Setup
 
@@ -190,7 +190,7 @@ An example character is provided below:
             -- The backend called functions that should be executed by the server
 			if reply.calls then
 				self:executeFunctions(player, reply.calls)
-				model:closeChat(chatId)
+				model:completeChat(chatId)
 				return
 			end
 
