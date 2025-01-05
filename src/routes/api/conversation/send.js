@@ -70,7 +70,8 @@ export default async function (app) {
                         },
                     },
                     422: {
-                        description: "Content moderated or error in OpenAI API",
+                        description:
+                            "Content moderated or error in Provider API",
                         type: "object",
                         properties: {
                             message: { type: "string" },
