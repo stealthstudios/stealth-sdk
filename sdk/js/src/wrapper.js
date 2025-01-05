@@ -121,6 +121,14 @@ export default class ConversationWrapper {
                             let fields = data.value;
                             if (datastoreData.fieldsMutator) {
                                 fields = datastoreData.fieldsMutator(fields);
+
+                                for (const [key, value] of Object.entries(
+                                    fields,
+                                )) {
+                                    if (value === undefined) {
+                                        delete fields[key];
+                                    }
+                                }
                             }
                             Object.assign(context, fields);
                         }
