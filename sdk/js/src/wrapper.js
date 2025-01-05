@@ -119,8 +119,8 @@ export default class ConversationWrapper {
                             );
                         if (data?.value) {
                             let fields = data.value;
-                            if (datastoreData.fieldsPredicate) {
-                                fields = datastoreData.fieldsPredicate(fields);
+                            if (datastoreData.fieldsMutator) {
+                                fields = datastoreData.fieldsMutator(fields);
                             }
                             Object.assign(context, fields);
                         }

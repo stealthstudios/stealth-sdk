@@ -9,10 +9,10 @@
 ## Table of Contents
 
 - [chatbot-sdk-js](#chatbot-sdk-js)
-    - [Table of Contents](#table-of-contents)
-    - [Usage](#usage)
-    - [Open Cloud](#open-cloud)
-    - [Functions](#functions)
+  - [Table of Contents](#table-of-contents)
+  - [Usage](#usage)
+  - [Open Cloud](#open-cloud)
+  - [Functions](#functions)
 
 ## Usage
 
@@ -137,23 +137,11 @@ const response = await conversation.send(
                 universeId: "1",
                 datastoreName: "DataStore",
                 entryKey: "1",
-                fieldsPredicate: (fields) => {
-                    // this seems complicated, it's just to account for nested fields
-                    // defining a schema for the fields would be a better approach in a production scenario
-                    const allowed = {};
-                    const traverse = (obj, path = "") => {
-                        for (const [key, value] of Object.entries(obj)) {
-                            const newPath = path ? `${path}.${key}` : key;
-                            if (key === "Win") {
-                                allowed[newPath] = value;
-                            }
-                            if (value && typeof value === "object") {
-                                traverse(value, newPath);
-                            }
-                        }
+                fieldsMutator: (fields) => {
+                    return {
+                        Wins: fields.Wins,
+                        Cash: fields.Cash,
                     };
-                    traverse(fields);
-                    return allowed;
                 },
             },
             {
