@@ -179,7 +179,10 @@ export default class Conversation {
             !agents.has(record.personality.hash) &&
             process.env.AGENT_PROVIDER === "eliza"
         ) {
-            await startAgent(record.personality.personality, record.personality.hash);
+            await startAgent(
+                record.personality.personality,
+                record.personality.hash,
+            );
         }
 
         const { usedMessages, tokenCount } = this.prepareMessageHistory(
