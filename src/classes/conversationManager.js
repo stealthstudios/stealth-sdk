@@ -5,6 +5,7 @@ import {
     generatePersonalityPrompt,
 } from "#utils/personalityUtils.js";
 import logger from "#utils/logger.js";
+import { startAgent, agents } from "#utils/eliza/index.js";
 
 /**
  * Manages conversation creation and retrieval.
@@ -34,27 +35,24 @@ class ConversationManager {
             personalityHash,
         );
 
-        const fetchedConversation = await prismaClient.conversation.create({
+        const conversation = await prismaClient.conversation.create({
             data: {
                 persistenceToken,
                 personalityId: personalityRecord.id,
                 users: {
                     connectOrCreate: users.map((user) => ({
                         where: { id: user.id },
-                        create: {
-                            id: user.id,
-                            name: user.name,
-                        },
+                        create: { id: user.id, name: user.name },
                     })),
                 },
             },
         });
 
-        if (!fetchedConversation) {
+        if (!conversation) {
             throw new Error("Failed to create conversation");
         }
 
-        return new Conversation(fetchedConversation);
+        return new Conversation(conversation);
     }
 
     /**
@@ -100,6 +98,7 @@ class ConversationManager {
      * Creates or retrieves a personality record
      * @private
      * @param { Object } personality - The personality configuration
+     * @param { Object } functions - The functions configuration
      * @param { string } personalityHash - Hash of the personality configuration
      * @returns { Promise<Object> } The personality record
      */
@@ -109,6 +108,9 @@ class ConversationManager {
         });
 
         if (existingRecord) {
+            if (!agents.has(personalityHash)) {
+                await startAgent(personality);
+            }
             return existingRecord;
         }
 
@@ -116,12 +118,17 @@ class ConversationManager {
             `Registered new personality ${personality.name} with hash ${personalityHash}`,
         );
 
+        if (!agents.has(personalityHash)) {
+            await startAgent(personality);
+        }
+
         return prismaClient.personality.create({
             data: {
                 name: personality.name,
                 hash: personalityHash,
                 prompt: generatePersonalityPrompt(personality),
-                functions: functions,
+                personality,
+                functions,
             },
         });
     }

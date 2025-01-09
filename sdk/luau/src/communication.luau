@@ -7,10 +7,10 @@ local remote
 
 if RunService:IsServer() then
 	remote = Instance.new("RemoteEvent")
-	remote.Name = "ChatbotSDK"
+	remote.Name = "StealthSDK"
 	remote.Parent = ReplicatedStorage
 else
-	remote = ReplicatedStorage:WaitForChild("ChatbotSDK")
+	remote = ReplicatedStorage:WaitForChild("StealthSDK")
 end
 
 function communication.send(topic: string, ...: any)

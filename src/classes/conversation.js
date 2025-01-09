@@ -2,6 +2,7 @@ import prismaClient from "#utils/prisma.js";
 import { getEncoding } from "js-tiktoken";
 import aiWrapper from "#utils/aiWrapper.js";
 import logger from "#utils/logger.js";
+import { startAgent, agents } from "#utils/eliza/index.js";
 
 export default class Conversation {
     /** @type {number} The unique identifier of the conversation */
@@ -37,7 +38,6 @@ export default class Conversation {
         const conversation = await prismaClient.conversation.findUnique({
             where: { id: this.id },
         });
-
         return conversation !== null;
     }
 
@@ -46,7 +46,9 @@ export default class Conversation {
      * @param {{users: Array<{id: string, name: string}>}} data Update data containing users
      */
     async update({ users }) {
-        if (!users || !(await this.exists())) return;
+        if (!users || !(await this.exists())) {
+            return;
+        }
 
         try {
             await prismaClient.conversation.update({
@@ -70,7 +72,7 @@ export default class Conversation {
             });
         } catch (error) {
             logger.error(
-                "An error occured while updating conversation users. This is a non-critical error, it generally just means that the conversation or user was deleted before this function was ran. Error:",
+                "An error occurred while updating conversation users. This is a non-critical error, it generally just means that the conversation or user was deleted before this function was ran. Error:",
             );
             logger.error(error);
         }
@@ -119,7 +121,9 @@ export default class Conversation {
             select: { busy: true },
         });
 
-        if (conversation.busy) return null;
+        if (conversation.busy) {
+            return null;
+        }
 
         await this.setBusyState(true);
 
@@ -137,12 +141,7 @@ export default class Conversation {
                     "Error saving messages to database. Conversation likely finished while awaiting AI response. Non-critical error:",
                 );
                 logger.error(err);
-
-                return {
-                    flagged: false,
-                    cancelled: true,
-                    content: "",
-                };
+                return { flagged: false, cancelled: true, content: "" };
             }
 
             return response;
@@ -154,11 +153,7 @@ export default class Conversation {
             }
         }
 
-        return {
-            flagged: false,
-            cancelled: true,
-            content: "",
-        };
+        return { flagged: false, cancelled: true, content: "" };
     }
 
     /**
@@ -179,11 +174,15 @@ export default class Conversation {
     async processMessage(message, context, userId) {
         const encoding = getEncoding("o200k_base");
         const record = await this.getConversationRecord();
+
+        if (!agents.has(record.personality.hash)) {
+            await startAgent(record.personality.personality);
+        }
+
         const { usedMessages, tokenCount } = this.prepareMessageHistory(
             record.messages,
             encoding,
         );
-
         const contextMessage = this.buildContextMessage(
             context,
             record.users,
@@ -195,7 +194,17 @@ export default class Conversation {
             { role: "user", content: message },
         );
 
-        const username = record.users.find((user) => user.id === userId).name;
+        const username = record.users.find((user) => user.id === userId)?.name;
+
+        if (!username) {
+            logger.debug(`User ${userId} not found in conversation ${this.id}`);
+
+            return {
+                messages: [],
+                response: { flagged: false, content: "", cancelled: true },
+            };
+        }
+
         const totalTokens =
             tokenCount +
             encoding.encode(record.personality.prompt).length +
@@ -210,10 +219,12 @@ export default class Conversation {
             message,
             userId,
             record.personality.functions,
+            record.personality.name,
+            this.persistenceToken || this.id,
+            username,
         );
 
         let responseContent = response.content;
-
         if (
             process.env.PROVIDER === "anthropic" &&
             responseContent.length === 0
@@ -225,10 +236,7 @@ export default class Conversation {
             messages: [
                 { role: "system", content: contextMessage },
                 { role: "user", content: message, senderId: userId },
-                {
-                    role: "assistant",
-                    content: responseContent,
-                },
+                { role: "assistant", content: responseContent },
             ],
             response: {
                 flagged: response.flagged,
@@ -291,12 +299,12 @@ export default class Conversation {
             },
             {
                 key: "username",
-                value: users.find((user) => user.id === userId).name,
+                value: users.find((user) => user.id === userId)?.name,
             },
         ];
 
         return [
-            "# Context",
+            "## Context",
             ...contextWithUsers.map((ctx) => `${ctx.key}: ${ctx.value}`),
         ].join("\n");
     }
@@ -305,25 +313,31 @@ export default class Conversation {
      * Gets AI response and handles moderation
      * @private
      */
-    async getAIResponse(messages, userMessage, userId, functions) {
-        let tools = [];
-
-        if (functions) {
-            tools = functions.map((func) => ({
-                type: "function",
-                function: {
-                    name: func.name,
-                    description: func.description,
-                    parameters: {
-                        type: "object",
-                        properties: func.parameters,
-                    },
-                },
-            }));
-        }
+    async getAIResponse(
+        messages,
+        userMessage,
+        userId,
+        functions,
+        agentName,
+        roomId,
+        userName,
+    ) {
+        const tools = functions
+            ? functions.map((func) => ({
+                  type: "function",
+                  function: {
+                      name: func.name,
+                      similes: func.similes,
+                      description: func.description,
+                      parameters: {
+                          type: "object",
+                          properties: func.parameters,
+                      },
+                  },
+              }))
+            : [];
 
         let systemMessage;
-
         if (process.env.PROVIDER === "anthropic") {
             const systemMessages = messages.filter(
                 (msg) => msg.role === "system",
@@ -342,6 +356,12 @@ export default class Conversation {
             messages,
             tools.length > 0 ? tools : null,
             systemMessage,
+            {
+                agentName,
+                roomId,
+                userId,
+                userName,
+            },
         );
 
         if (!response) {
@@ -352,7 +372,6 @@ export default class Conversation {
             logger.debug(
                 `Got ${response.tool_calls.length} tool calls from last message response`,
             );
-
             return {
                 flagged: false,
                 content: "",
@@ -417,7 +436,9 @@ export default class Conversation {
                 })),
         });
 
-        if (!context?.length) return;
+        if (!context?.length) {
+            return;
+        }
 
         const lastMessageId = createdMessages[createdMessages.length - 1].id;
         await prismaClient.messageContext.createMany({

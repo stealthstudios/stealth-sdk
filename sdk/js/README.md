@@ -1,31 +1,31 @@
 <div align="center">
 
-# chatbot-sdk-js
+# stealth-sdk-js
 
-[![CI JS](https://github.com/VirtualButFake/chatbot-sdk/actions/workflows/ci-js.yaml/badge.svg)](https://github.com/VirtualButFake/chatbot-sdk/actions)
+[![CI JS](https://github.com/stealthstudios/stealth-sdk/actions/workflows/ci-js.yaml/badge.svg)](https://github.com/stealthstudios/stealth-sdk/actions)
 
 </div>
 
 ## Table of Contents
 
-- [chatbot-sdk-js](#chatbot-sdk-js)
-  - [Table of Contents](#table-of-contents)
-  - [Usage](#usage)
-  - [Open Cloud](#open-cloud)
-  - [Functions](#functions)
+- [stealth-sdk-js](#stealth-sdk-js)
+    - [Table of Contents](#table-of-contents)
+    - [Usage](#usage)
+    - [Open Cloud](#open-cloud)
+    - [Functions](#functions)
 
 ## Usage
 
 Installation can be done through NPM (**todo: upload**, just clone the repo for now).
 
 ```bash
-npm install chatbot-sdk
+npm install stealth-sdk
 ```
 
 You may then use the SDK as follows:
 
 ```javascript
-import sdk from "chatbot-sdk";
+import sdk from "stealth-sdk";
 
 const chatbot = new sdk({
     url: "API_URL",
@@ -38,13 +38,13 @@ const character = chatbot.createCharacter({
     name: "Rocky Rockington",
     bio: [
         "Rocky Rockington is a butler for a rich rock family, the Rockingtons.",
-        "Will assist the player with their needs in the world of Chatbot SDK RPG",
+        "Will assist the player with their needs in the world of StealthSDK RPG",
         "Answers in a polite and helpful manner.",
         "Does not express opinions or beliefs, stating only facts.",
     ],
     lore: [
         "Is a butler for a rich rock family, the Rockingtons.",
-        "Is a friendly butler and will assist the player with their needs in the world of Chatbot SDK RPG.",
+        "Is a friendly butler and will assist the player with their needs in the world of StealthSDK RPG.",
         "Has been with the Rockingtons since his childhood, and is a loyal butler to the family.",
     ],
     knowledge: [
@@ -98,6 +98,9 @@ const character = chatbot.createCharacter({
             },
         ],
     ],
+    topics: ["StealthSDK RPG", "Rockingtons"],
+    adjectives: ["friendly", "helpful", "polite", "loyal"],
+    style: ["speaks in a polite and helpful manner"],
 });
 
 // Create a conversation with the character, for the user with ID 1

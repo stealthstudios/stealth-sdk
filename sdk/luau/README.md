@@ -1,24 +1,26 @@
 <div align="center">
 
-# chatbot-sdk-luau
+# stealth-sdk-luau
 
-[![CI Luau](https://github.com/VirtualButFake/chatbot-sdk/actions/workflows/ci-luau.yaml/badge.svg)](https://github.com/VirtualButFake/chatbot-sdk/actions)
+[![CI Luau](https://github.com/stealthstudios/stealth-sdk/actions/workflows/ci-luau.yaml/badge.svg)](https://github.com/stealthstudios/stealth-sdk/actions)
 
 </div>
 
 ## Table of Contents
 
-- [chatbot-sdk-luau](#chatbot-sdk-luau)
-  - [Table of Contents](#table-of-contents)
-  - [Setup](#setup)
-    - [Development](#development)
-  - [Character Format](#character-format)
-  - [Adding NPCs](#adding-npcs)
-    - [Configuring NPCs](#configuring-npcs)
+- [stealth-sdk-luau](#stealth-sdk-luau)
+    - [Table of Contents](#table-of-contents)
+    - [Setup](#setup)
+        - [Development](#development)
+    - [Character Format](#character-format)
+    - [Adding NPCs](#adding-npcs)
+        - [Configuring NPCs](#configuring-npcs)
 
 ## Setup
 
 This SDK comes with a built-in demo place to test the backend. It consists of a baseplate and a test NPC. Players can interact with this NPC to test the chatbot. It is non-persistent and allows group interactions.
+
+This SDK comes bundled with a default character config, which implements default behaviour for the chatbot. These values can all be overridden in the character config, implementing custom behaviour when a player leaves the model's radius, enters the model's radius, sends a message, or more. This character config can be viewed [here](./src/server/defaultCharacterConfig.luau).
 
 ### Development
 
@@ -79,6 +81,11 @@ An example character is provided below:
                 "Historical knowledge covers major world events, civilizations, and cultural developments.",
                 "Mathematical concepts include algebra, geometry, statistics, and basic calculus.",
                 "Technology topics include computers, internet, digital systems, and modern innovations.",
+            },
+            topics = { "StealthSDK RPG" },
+            adjectives = { "friendly", "helpful", "polite", "loyal" },
+            style = {
+                "speaks in a polite and he"
             },
             -- How does this character interact with others?
             messageExamples = {

@@ -8,6 +8,9 @@ export default class Character {
      * @property {string[]} lore - Lore/background information
      * @property {string[]} knowledge - Knowledge base
      * @property {Array<Array<{user: string, content: string}>>} messageExamples - Example conversation flows
+     * @property {string[]} topics - Topics the character can talk about
+     * @property {string[]} adjectives - Adjectives the character can be described as
+     * @property {string[]} style - Style of the character
      */
 
     /**

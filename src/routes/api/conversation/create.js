@@ -19,6 +19,7 @@ export default async function (app) {
                             type: "array",
                             items: {
                                 type: "object",
+                                required: ["name", "parameters"],
                                 properties: {
                                     name: { type: "string" },
                                     description: { type: "string" },
@@ -34,6 +35,12 @@ export default async function (app) {
                                                         name: {
                                                             type: "string",
                                                         },
+                                                        similes: {
+                                                            type: "array",
+                                                            items: {
+                                                                type: "string",
+                                                            },
+                                                        },
                                                         type: {
                                                             type: "string",
                                                         },
@@ -46,7 +53,6 @@ export default async function (app) {
                                         },
                                     },
                                 },
-                                required: ["name", "parameters"],
                             },
                         },
                         personality: {
@@ -75,6 +81,31 @@ export default async function (app) {
                                                 user: { type: "string" },
                                                 content: { type: "string" },
                                             },
+                                        },
+                                    },
+                                },
+                                topics: {
+                                    type: "array",
+                                    items: { type: "string" },
+                                },
+                                adjectives: {
+                                    type: "array",
+                                    items: { type: "string" },
+                                },
+                                style: {
+                                    type: "object",
+                                    properties: {
+                                        all: {
+                                            type: "array",
+                                            items: { type: "string" },
+                                        },
+                                        chat: {
+                                            type: "array",
+                                            items: { type: "string" },
+                                        },
+                                        post: {
+                                            type: "array",
+                                            items: { type: "string" },
                                         },
                                     },
                                 },

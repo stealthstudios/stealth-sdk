@@ -19,6 +19,9 @@ import {
  * @property {string[]} lore - Lore/background information
  * @property {string[]} knowledge - Knowledge base
  * @property {Array<Array<{user: string, content: string}>>} messageExamples - Example conversation flows
+ * @property {string[]} topics - Topics to discuss
+ * @property {string[]} adjectives - Adjectives to describe the personality
+ * @property {string[]} style - Style of the personality
  */
 
 /**
@@ -73,6 +76,12 @@ export default class ConversationWrapper {
                     parameters: func.parameters,
                 });
             }
+        }
+
+        if (personality.style) {
+            personality.style = {
+                all: { ...personality.style },
+            };
         }
 
         try {

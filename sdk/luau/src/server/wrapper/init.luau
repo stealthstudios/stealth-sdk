@@ -51,10 +51,19 @@ function wrapper.create(
 		for name, func in config.functions do
 			table.insert(functions, {
 				name = name,
+				similes = func.similes,
 				description = func.description,
 				parameters = func.parameters,
 			})
 		end
+	end
+
+	if config.personality.style then
+		local oldStyle = config.personality.style
+
+		config.personality.style = {
+			all = oldStyle,
+		}
 	end
 
 	local response: Response<ConversationData> = sendRequest(`{wrapperData.url}/api/conversation/create`, "POST", {
@@ -163,10 +172,14 @@ export type Personality = {
 	lore: { string },
 	knowledge: { string },
 	messageExamples: { { { user: string, content: string } } },
+	topics: { string }?,
+	adjectives: { string }?,
+	style: { string }?,
 }
 
 export type Function = {
 	description: string?,
+	similes: { string }?,
 	parameters: {
 		{
 			name: string,

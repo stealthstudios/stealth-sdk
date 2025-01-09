@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model Player {
@@ -71,8 +71,9 @@ model Personality {
 
   name String
 
-  prompt    String?
-  functions Json?
+  personality Json
+  prompt      String?
+  functions   Json?
 
   conversations Conversation[]
 
