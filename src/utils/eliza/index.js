@@ -1,4 +1,4 @@
-import { AgentRuntime, elizaLogger, stringToUuid } from "@elizaos/core";
+import { AgentRuntime, elizaLogger } from "@elizaos/core";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -15,9 +15,6 @@ export const wait = (minTime = 1000, maxTime = 3000) => {
         Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
     return new Promise((resolve) => setTimeout(resolve, waitTime));
 };
-
-// eslint-disable-next-line no-unused-vars
-let nodePlugin;
 
 export const agents = new Map();
 
@@ -42,10 +39,10 @@ function createAgent(character, db, cache, token) {
     });
 }
 
-export async function startAgent(character) {
+export async function startAgent(character, hash) {
     try {
         // Set default character properties
-        character.id = character.id ?? stringToUuid(character.name);
+        character.id = hash;
         character.username = character.username ?? character.name;
         character.modelProvider = character.modelProvider ?? "openai";
         character.clients = character.clients ?? [];

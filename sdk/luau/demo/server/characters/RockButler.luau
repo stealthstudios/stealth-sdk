@@ -31,7 +31,7 @@ return engine.createCharacter({
 						content = "Hello",
 					},
 					{
-						user = "You", 
+						user = "You",
 						content = "Hello, how may I help you today?",
 					},
 				},
@@ -47,7 +47,7 @@ return engine.createCharacter({
 				},
 				{
 					{
-						user = "User", 
+						user = "User",
 						content = "What is the Rockingtons' favorite food?",
 					},
 					{
@@ -68,7 +68,7 @@ return engine.createCharacter({
 				{
 					{
 						user = "User",
-						content = "Who is the king of this world?",
+						content = "Who is the king of this world??",
 					},
 					{
 						user = "You",
@@ -145,6 +145,13 @@ return engine.createCharacter({
 			end
 
 			if reply.calls then
+				if reply.content ~= "" and reply.content ~= nil then
+					model:setChatContent(chatId, player, reply.content)
+					model:cleanChat(chatId)
+
+					chatId = model:createChat(conversation)
+				end
+
 				self:executeFunctions(player, reply.calls)
 				model:completeChat(chatId)
 				return

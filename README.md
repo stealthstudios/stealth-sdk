@@ -4,7 +4,7 @@
 
 <img src="./static/eliza-rblx.png" alt="StealthSDK Banner" width="100%" />
 
-### [![CI Backend](https://github.com/stealthstudios/chatbot-sdk/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/stealthstudios/chatbot-sdk/actions) <!-- omit from toc -->
+### [![CI Backend](https://github.com/stealthstudios/stealthsdk/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/stealthstudios/stealthsdk/actions) <!-- omit from toc -->
 
 ### Supported SDKs <!-- omit from toc -->
 

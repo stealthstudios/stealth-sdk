@@ -89,8 +89,15 @@ local defaultCharacterConfig: character.Config = {
 			end
 
 			if reply.calls then
+				if reply.content ~= "" and reply.content ~= nil then
+					model:setChatContent(chatId, player, reply.content)
+					model:cleanChat(chatId)
+
+					chatId = model:createChat(conversation)
+				end
+
 				self:executeFunctions(player, reply.calls)
-				model:closeChat(chatId)
+				model:completeChat(chatId)
 				return
 			end
 

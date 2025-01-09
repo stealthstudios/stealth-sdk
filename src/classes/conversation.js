@@ -175,8 +175,11 @@ export default class Conversation {
         const encoding = getEncoding("o200k_base");
         const record = await this.getConversationRecord();
 
-        if (!agents.has(record.personality.hash)) {
-            await startAgent(record.personality.personality);
+        if (
+            !agents.has(record.personality.hash) &&
+            process.env.AGENT_PROVIDER === "eliza"
+        ) {
+            await startAgent(record.personality.personality, record.personality.hash);
         }
 
         const { usedMessages, tokenCount } = this.prepareMessageHistory(
@@ -379,6 +382,20 @@ export default class Conversation {
                     name: call.function.name,
                     parameters: JSON.parse(call.function.arguments),
                 })),
+            };
+        }
+
+        if (response.action) {
+            return {
+                flagged: false,
+                content: response.message,
+                calls: [
+                    {
+                        name: response.action.action,
+                        message: response.action.data.message,
+                        parameters: response.action.data.parameters,
+                    },
+                ],
             };
         }
 

@@ -107,9 +107,22 @@ class ConversationManager {
             where: { hash: personalityHash },
         });
 
+        personality.messageExamples = personality.messageExamples.map(
+            (exampleCollection) =>
+                exampleCollection.map((example) => ({
+                    user: example.user,
+                    content: {
+                        text: example.content,
+                    },
+                })),
+        );
+
         if (existingRecord) {
-            if (!agents.has(personalityHash)) {
-                await startAgent(personality);
+            if (
+                !agents.has(personalityHash) &&
+                process.env.AGENT_PROVIDER === "eliza"
+            ) {
+                await startAgent(personality, personalityHash);
             }
             return existingRecord;
         }
@@ -118,8 +131,11 @@ class ConversationManager {
             `Registered new personality ${personality.name} with hash ${personalityHash}`,
         );
 
-        if (!agents.has(personalityHash)) {
-            await startAgent(personality);
+        if (
+            !agents.has(personalityHash) &&
+            process.env.AGENT_PROVIDER === "eliza"
+        ) {
+            await startAgent(personality, personalityHash);
         }
 
         return prismaClient.personality.create({

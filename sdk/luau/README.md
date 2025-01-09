@@ -9,12 +9,12 @@
 ## Table of Contents
 
 - [stealth-sdk-luau](#stealth-sdk-luau)
-    - [Table of Contents](#table-of-contents)
-    - [Setup](#setup)
-        - [Development](#development)
-    - [Character Format](#character-format)
-    - [Adding NPCs](#adding-npcs)
-        - [Configuring NPCs](#configuring-npcs)
+  - [Table of Contents](#table-of-contents)
+  - [Setup](#setup)
+    - [Development](#development)
+  - [Character Format](#character-format)
+  - [Adding NPCs](#adding-npcs)
+    - [Configuring NPCs](#configuring-npcs)
 
 ## Setup
 
@@ -82,11 +82,6 @@ An example character is provided below:
                 "Mathematical concepts include algebra, geometry, statistics, and basic calculus.",
                 "Technology topics include computers, internet, digital systems, and modern innovations.",
             },
-            topics = { "StealthSDK RPG" },
-            adjectives = { "friendly", "helpful", "polite", "loyal" },
-            style = {
-                "speaks in a polite and he"
-            },
             -- How does this character interact with others?
             messageExamples = {
                 {
@@ -118,6 +113,14 @@ An example character is provided below:
                     },
                 },
             },
+            -- What topics does this character discuss?
+            topics = { "StealthSDK RPG" },
+            -- What adjectives describe this character?
+            adjectives = { "friendly", "helpful", "polite", "loyal" },
+            -- What style does this character speak in?
+            style = {
+                "speaks in a polite and helpful manner",
+            },
         },
     },
     -- Functions to be passed to the backend.
@@ -125,6 +128,10 @@ An example character is provided below:
 		color = {
             -- What does this function do, when should it be called?
 			description = "Changes the color of the baseplate",
+            similes = {
+                "changeColor",
+                "setBaseplateColor",
+            },
 			parameters = {
 				color = {
 					description = 'The color to change to. Can be either "red", "green", or "blue".',
@@ -194,8 +201,17 @@ An example character is provided below:
                 return
             end
 
-            -- The backend called functions that should be executed by the server
+            -- Did the prompt result in any called functions?
 			if reply.calls then
+                -- Did the provider generate any message to go along with the function call? (This occurs with the Eliza provider.)
+				if reply.content ~= "" and reply.content ~= nil then
+					model:setChatContent(chatId, player, reply.content)
+                    model:cleanChat(chatId)
+                    -- Let's create a new chat for the function call's response.
+                    chatId = model:createChat(conversation)
+				end
+
+                -- Execute the functions.
 				self:executeFunctions(player, reply.calls)
 				model:completeChat(chatId)
 				return

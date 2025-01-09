@@ -57,9 +57,20 @@ export function generatePersonalityPrompt(personality) {
         {
             title: "Example Conversations",
             content: personality.messageExamples.map((example) =>
-                example.map((msg) => `${msg.user}: ${msg.content}`).join("\n"),
+                example
+                    .map((msg) => `${msg.user}: ${msg.content.text}`)
+                    .join("\n"),
             ),
         },
+        {
+            title: "Topics",
+            content: personality.topics,
+        },
+        {
+            title: "Adjectives",
+            content: personality.adjectives,
+        },
+
         {
             title: "Rules",
             content: defaultRules,

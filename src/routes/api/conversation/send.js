@@ -44,6 +44,7 @@ export default async function (app) {
                                     type: "object",
                                     properties: {
                                         name: { type: "string" },
+                                        message: { type: "string" },
                                         parameters: {
                                             type: "object",
                                             additionalProperties: {
@@ -51,6 +52,7 @@ export default async function (app) {
                                             },
                                         },
                                     },
+                                    required: ["name", "parameters"],
                                 },
                             },
                         },

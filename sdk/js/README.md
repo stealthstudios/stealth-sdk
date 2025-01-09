@@ -179,6 +179,8 @@ const character = chatbot.createCharacter(
     {
         // Define the function name
         print: {
+            // What are alternative names for this function?
+            similes: ["log"],
             // What does this function do? When should it be used?
             description:
                 "Prints a message to the console. The user must provide a message to print.",
@@ -197,4 +199,23 @@ const character = chatbot.createCharacter(
         },
     },
 );
+
+const conversation = await character.createConversation({
+    id: 1,
+    name: "User",
+});
+
+const response = await conversation.send(1, "Print 'Hello, world!'");
+
+if (response.calls) {
+    for (const call of response.calls) {
+        if (character.functions[call.function]) {
+            character.functions[call.function].callback(
+                1,
+                conversation,
+                call.parameters,
+            );
+        }
+    }
+}
 ```

@@ -82,7 +82,8 @@ class AIWrapper {
         });
 
         return {
-            message: response[0].text,
+            message: response.find((r) => r.text)?.text,
+            action: response.find((r) => r.action && r.data),
         };
     }
 
