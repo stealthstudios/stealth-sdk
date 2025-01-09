@@ -4,7 +4,7 @@
 
 <img src="./static/eliza-rblx.png" alt="StealthSDK Banner" width="100%" />
 
-### [![CI Backend](https://github.com/stealthstudios/stealthsdk/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/stealthstudios/stealthsdk/actions) <!-- omit from toc -->
+### [![CI Backend](https://github.com/stealthstudios/stealth-sdk/actions/workflows/ci-backend.yaml/badge.svg)](https://github.com/stealthstudios/stealth-sdk/actions) <!-- omit from toc -->
 
 ### Supported SDKs <!-- omit from toc -->
 
@@ -16,17 +16,17 @@
 ## Table of Contents
 
 - [Stealth SDK](#stealth-sdk)
-    - [Table of Contents](#table-of-contents)
-    - [Features](#features)
-    - [Usage](#usage)
-        - [Installation](#installation)
-        - [Environment Variables](#environment-variables)
-    - [Running the application](#running-the-application)
-        - [Development](#development)
-        - [Production](#production)
-        - [Docker](#docker)
-    - [Endpoint Documentation](#endpoint-documentation)
-    - [Contributing](#contributing)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Usage](#usage)
+    - [Installation](#installation)
+    - [Environment Variables](#environment-variables)
+  - [Running the application](#running-the-application)
+    - [Development](#development)
+    - [Production](#production)
+    - [Docker](#docker)
+  - [Endpoint Documentation](#endpoint-documentation)
+  - [Contributing](#contributing)
 
 ## Features
 
