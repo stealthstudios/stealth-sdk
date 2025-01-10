@@ -51,7 +51,7 @@ This application was built with Node v23, and using this version of Node is reco
 ```bash
 git clone https://github.com/stealthstudios/stealth-sdk.git
 cd stealth-sdk
-npm install
+pnpm install
 ```
 
 ### Environment Variables
