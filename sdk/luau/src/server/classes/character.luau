@@ -101,14 +101,45 @@ function character.executeFunctions(
 			},
 		}
 	}
-)
+): {
+	{
+		name: string,
+		success: boolean,
+		message: string?,
+	}
+}
+	local results = {}
+
 	for _, func in functions do
 		local foundFunction = self.functions[func.name]
 
 		if foundFunction then
-			foundFunction.callback(player, self:getConversationForPlayer(player), func.parameters)
+			local success, response =
+				pcall(foundFunction.callback, player, self:getConversationForPlayer(player), func.parameters)
+
+			if not success then
+				warn(`{constants.ENGINE_LOG_PREFIX} Function {func.name} failed to execute: {response}`)
+				table.insert(results, {
+					name = func.name,
+					success = false,
+					-- We deliberately don't show the error message to the player - this may contain sensitive information.
+					message = "An error occurred while executing the function.",
+				})
+
+				continue
+			end
+
+			if response then
+				table.insert(results, {
+					name = func.name,
+					success = response.success,
+					message = response.message,
+				})
+			end
 		end
 	end
+
+	return results
 end
 
 function character.getInteractingModel(self: Character, player: Player): characterModel.CharacterModel?
@@ -233,7 +264,11 @@ type Events = {
 }
 
 type Function = {
-	callback: (player: Player, conversation: conversation.Conversation, data: { [string]: any }) -> (),
+	callback: (
+		player: Player,
+		conversation: conversation.Conversation,
+		data: { [string]: any }
+	) -> { success: boolean, message: string? }?,
 	description: string?,
 	parameters: {
 		{

@@ -126,7 +126,14 @@ end
 
 local function engineChat(self: Engine, player: Player, message: string): nil
 	for _, character: modelCharacter.Character in self.characters do
-		local conversation = character:getConversationForPlayer(player, false)
+		local model = character:getInteractingModel(player)
+
+		if not model then
+			continue
+		end
+
+		local conversation = character:getConversationForPlayer(player, true)
+
 		if conversation then
 			character:_chat(player, message)
 		end

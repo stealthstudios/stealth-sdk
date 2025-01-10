@@ -121,12 +121,19 @@ function characterModel.createChat(self: CharacterModel, chatConversation: conve
 	return chatId
 end
 
-function characterModel.completeChat(self: CharacterModel, chatId: string)
+function characterModel.provideActionFeedback(
+	self: CharacterModel,
+	chatId: string,
+	feedback: {
+		success: boolean,
+		message: string?,
+	}
+)
 	if not self._chats[chatId] then
 		return
 	end
 
-	sendDataToAllConversationMembers(self._chats[chatId], "chatCompleted", chatId)
+	sendDataToAllConversationMembers(self._chats[chatId], "actionFeedback", chatId, feedback)
 	self:cleanChat(chatId)
 end
 

@@ -61,9 +61,6 @@ local defaultCharacterConfig: character.Config = {
 		interestRadius = 10,
 	},
 	events = {
-		onRadiusEnter = function(self, player)
-			self:getConversationForPlayer(player, true)
-		end,
 		onRadiusLeft = function(_, player, conversation)
 			if conversation then
 				conversation:removePlayer(player)
@@ -96,8 +93,24 @@ local defaultCharacterConfig: character.Config = {
 					chatId = model:createChat(conversation)
 				end
 
-				self:executeFunctions(player, reply.calls)
-				model:completeChat(chatId)
+				local actionResponses = self:executeFunctions(player, reply.calls)
+				local feedbackProvided = false
+
+				for _, actionResponse in actionResponses do
+					if not actionResponse.success then
+						feedbackProvided = true
+						model:provideActionFeedback(chatId, actionResponse)
+						break
+					end
+				end
+
+				if not feedbackProvided then
+					model:provideActionFeedback(chatId, {
+						success = true,
+						message = "Action ran!",
+					})
+				end
+
 				return
 			end
 

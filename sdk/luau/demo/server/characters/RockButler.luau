@@ -152,8 +152,24 @@ return engine.createCharacter({
 					chatId = model:createChat(conversation)
 				end
 
-				self:executeFunctions(player, reply.calls)
-				model:completeChat(chatId)
+				local actionResponses = self:executeFunctions(player, reply.calls)
+				local feedbackProvided = false
+
+				for _, actionResponse in actionResponses do
+					if not actionResponse.success then
+						feedbackProvided = true
+						model:provideActionFeedback(chatId, actionResponse)
+						break
+					end
+				end
+
+				if not feedbackProvided then
+					model:provideActionFeedback(chatId, {
+						success = true,
+						message = "Action ran!",
+					})
+				end
+
 				return
 			end
 

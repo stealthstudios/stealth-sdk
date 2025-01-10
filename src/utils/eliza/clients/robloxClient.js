@@ -55,7 +55,7 @@ export class RobloxClient {
             context,
             tools,
         } = data;
-        console.log(agentId);
+
         const roomId = stringToUuid(rawRoomId ?? `default-room-${agentId}`);
         const normalizedUserId = stringToUuid(userId);
 
@@ -132,8 +132,6 @@ export class RobloxClient {
             },
         ];
 
-        // This is currently nonfunctional!
-        // Eliza does not (as far as I know) support tools, so we can't receive parameters for these commands!
         if (tools) {
             runtime.actions = tools.map((tool) => ({
                 name: tool.function.name,

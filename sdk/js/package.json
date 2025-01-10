@@ -1,6 +1,6 @@
 {
-    "name": "stealth-sdk",
-    "version": "1.0.0",
+    "name": "stealthsdk-js",
+    "version": "0.1.0",
     "main": "src/index.js",
     "type": "module",
     "scripts": {
@@ -8,6 +8,9 @@
         "format": "prettier --write \"./src/**/*.js\"",
         "ci:format": "prettier --check \"./src/**/*.js\""
     },
+    "files": [
+        "src"
+    ],
     "author": "",
     "license": "ISC",
     "description": "",

@@ -8,7 +8,7 @@
 
 ### Supported SDKs <!-- omit from toc -->
 
-![Luau](https://img.shields.io/badge/Luau-008080?logo=data:image/svg%2bxml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMy41NCAxMy41NCI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiNmZmY7ZmlsbC1ydWxlOmV2ZW5vZGQ7fTwvc3R5bGU+PC9kZWZzPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTMuNjcsMmE2LjE5LDYuMTksMCwwLDAtLjk1LDIuNDhsLTEsMy44NkE2LDYsMCwwLDAsMS4yNywxMSwyLjQ5LDIuNDksMCwwLDAsMiwxMi4zM2E2LjE5LDYuMTksMCwwLDAsMi40OC45NWwzLjg2LDFhNiw2LDAsMCwwLDIuNjEuNDJBMi40OSwyLjQ5LDAsMCwwLDEyLjMzLDE0YTYuMTksNi4xOSwwLDAsMCwuOTUtMi40OGwxLTMuODZBNiw2LDAsMCwwLDE0LjczLDUsMi40OSwyLjQ5LDAsMCwwLDE0LDMuNjdhNi4xOSw2LjE5LDAsMCwwLTIuNDgtLjk1bC0zLjg2LTFBNiw2LDAsMCwwLDUsMS4yNywyLjQ5LDIuNDksMCwwLDAsMy42NywyWk05LjgxLDQuMzdhMS4xOSwxLjE5LDAsMCwwLS4xOS40OUw5LjEzLDYuN0ExLjIyLDEuMjIsMCwwLDAsOSw3LjIyYS41LjUsMCwwLDAsLjE2LjI3LDEuMzUsMS4zNSwwLDAsMCwuNDkuMTlsMS44NC40OWExLjE2LDEuMTYsMCwwLDAsLjUyLjA4LjQ5LjQ5LDAsMCwwLC4yNy0uMTUsMS40MiwxLjQyLDAsMCwwLC4xOS0uNUwxMyw1Ljc3YTEuMiwxLjIsMCwwLDAsLjA4LS41M0EuNDYuNDYsMCwwLDAsMTIuOTMsNWExLjI1LDEuMjUsMCwwLDAtLjUtLjE5TDEwLjYsNC4zYTEuMjYsMS4yNiwwLDAsMC0uNTMtLjA5QS40OC40OCwwLDAsMCw5LjgxLDQuMzdaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMS4yMyAtMS4yMykiLz48L3N2Zz4=)
+![Roblox](https://img.shields.io/badge/Roblox-000000?logo=data:image/svg%2bxml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIiA/Pgo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZlcnNpb249IjEuMSIgd2lkdGg9IjI2NyIgaGVpZ2h0PSIyNjciIHZpZXdCb3g9IjAgMCAyNjcgMjY3IiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPGRlc2M+Q3JlYXRlZCB3aXRoIEZhYnJpYy5qcyAzLjYuNjwvZGVzYz4KPGRlZnM+CjwvZGVmcz4KPGcgdHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgMSAtMTg1LjUgMjQ4LjA1KSIgaWQ9ImJhY2tncm91bmRyZWN0IiAgPgo8cmVjdCBzdHlsZT0ic3Ryb2tlOiBub25lOyBzdHJva2Utd2lkdGg6IDE7IHN0cm9rZS1kYXNoYXJyYXk6IG5vbmU7IHN0cm9rZS1saW5lY2FwOiBidXR0OyBzdHJva2UtZGFzaG9mZnNldDogMDsgc3Ryb2tlLWxpbmVqb2luOiBtaXRlcjsgc3Ryb2tlLW1pdGVybGltaXQ6IDQ7IGZpbGw6IG5vbmU7IGZpbGwtcnVsZTogbm9uemVybzsgb3BhY2l0eTogMTsiICB4PSItNTAiIHk9Ii01MCIgcng9IjAiIHJ5PSIwIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgLz4KPC9nPgo8ZyB0cmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAxIDM2Ljc2IDQxMy4yOCkiIGlkPSJzdmdfMiIgID4KPHBvbHlsaW5lIHN0eWxlPSJzdHJva2U6IHJnYigyNTUsMjU1LDI1NSk7IHN0cm9rZS13aWR0aDogMDsgc3Ryb2tlLWRhc2hhcnJheTogbm9uZTsgc3Ryb2tlLWxpbmVjYXA6IGJ1dHQ7IHN0cm9rZS1kYXNob2Zmc2V0OiAwOyBzdHJva2UtbGluZWpvaW46IG1pdGVyOyBzdHJva2UtbWl0ZXJsaW1pdDogNDsgZmlsbDogbm9uZTsgZmlsbC1ydWxlOiBub256ZXJvOyBvcGFjaXR5OiAxOyIgIHBvaW50cz0iLTguNywtMTIuNTkgLTEzLjUyLC0yMC43NCAtMTIuNDEsLTIxLjExIC0xMS42NywtMjEuNDggLTEwLjU2LC0yMS40OCAtOC43LC0yMS40OCAtNy4yMiwtMjEuNDggLTUuNzQsLTIxLjQ4IC01LC0yMS4xMSAtMy41MiwtMjAuNzQgLTIuNzgsLTIwLjc0IC0yLjA0LC0yMC4zNyAtMi4wNCwtMjAuMzcgLTAuOTMsLTE5LjI2IDAuMTksLTE4LjUyIDAuOTMsLTE3Ljc4IDEuNjcsLTE2LjY3IDIuNDEsLTE1LjU2IDMuMTUsLTE0LjgxIDMuNTIsLTEzLjcgMy44OSwtMTIuNTkgOC43LDQuODEgOS40NCw3Ljc4IDEwLjkzLDE0LjA3IDExLjY3LDE2LjY3IDEyLjA0LDE3Ljc4IDEyLjQxLDE4Ljg5IDEzLjE1LDIwLjM3IDEzLjE1LDIxLjExIDEzLjUyLDIxLjExIDEzLjUyLDIxLjQ4ICIgLz4KPC9nPgo8ZyB0cmFuc2Zvcm09Im1hdHJpeCg0LjM5IDAgMCA0LjM5IDEzMy41OCAxMzMuNjEpIiAgPgo8cGF0aCBzdHlsZT0ic3Ryb2tlOiBub25lOyBzdHJva2Utd2lkdGg6IDE7IHN0cm9rZS1kYXNoYXJyYXk6IG5vbmU7IHN0cm9rZS1saW5lY2FwOiBidXR0OyBzdHJva2UtZGFzaG9mZnNldDogMDsgc3Ryb2tlLWxpbmVqb2luOiBtaXRlcjsgc3Ryb2tlLW1pdGVybGltaXQ6IDQ7IGZpbGw6IHJnYigyNTUsMjU1LDI1NSk7IGZpbGwtcnVsZTogbm9uemVybzsgb3BhY2l0eTogMTsiICB0cmFuc2Zvcm09IiB0cmFuc2xhdGUoLTczLjEzLCAtMjYuODgpIiBkPSJNIDU3LjYgMCBMIDQ2LjI2IDQyLjQgbCA0Mi40IDExLjM1IEwgMTAwIDExLjM1IFogbSAxMS4yIDE5LjQ3IGwgMTEuODMgMy4xNyBsIC0zLjE3IDExLjgzIGwgLTExLjg0IC0zLjE3IHoiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgLz4KPC9nPgo8L3N2Zz4=)
 ![JavaScript](https://img.shields.io/badge/JavaScript-E4CF0D?logo=data:image/svg%2bxml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMiAxMiI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiNmZmY7fTwvc3R5bGU+PC9kZWZzPjxwYXRoIGNsYXNzPSJjbHMtMSIgZD0iTTEzLjczLDMuMzZhMi41LDIuNSwwLDAsMC0xLjA5LTEuMDlBNi4zMSw2LjMxLDAsMCwwLDEwLDJINmE2LjMxLDYuMzEsMCwwLDAtMi42NC4yN0EyLjUsMi41LDAsMCwwLDIuMjcsMy4zNiw2LjMxLDYuMzEsMCwwLDAsMiw2djRhNi4zMSw2LjMxLDAsMCwwLC4yNywyLjY0LDIuNSwyLjUsMCwwLDAsMS4wOSwxLjA5QTYuMzEsNi4zMSwwLDAsMCw2LDE0aDRhNi4zMSw2LjMxLDAsMCwwLDIuNjQtLjI3LDIuNSwyLjUsMCwwLDAsMS4wOS0xLjA5QTYuMzEsNi4zMSwwLDAsMCwxNCwxMFY2QTYuMzEsNi4zMSwwLDAsMCwxMy43MywzLjM2Wk04LDcuNVYxMWEyLDIsMCwwLDEtNCwwdi0uNUg1VjExYTEsMSwwLDAsMCwyLDBWOEg1LjVWN0g4Wm0yLjc1LDJoLjVhMS43NSwxLjc1LDAsMCwxLDAsMy41SDExYTIsMiwwLDAsMS0yLTJoMWExLDEsMCwwLDAsMSwxaC4yNWEuNzUuNzUsMCwwLDAsMC0xLjVoLS41YTEuNzUsMS43NSwwLDAsMSwwLTMuNUgxMWEyLDIsMCwwLDEsMiwySDEyYTEsMSwwLDAsMC0xLTFoLS4yNWEuNzUuNzUsMCwwLDAsMCwxLjVaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMiAtMikiLz48L3N2Zz4=)
 
 </div>
@@ -22,9 +22,9 @@
     - [Installation](#installation)
     - [Environment Variables](#environment-variables)
   - [Running the application](#running-the-application)
+    - [Setting up the database](#setting-up-the-database)
     - [Development](#development)
     - [Production](#production)
-    - [Docker](#docker)
   - [Endpoint Documentation](#endpoint-documentation)
   - [Contributing](#contributing)
 
@@ -49,12 +49,14 @@ Developers can then use the SDKs to interact with this backend, and build their 
 This application was built with Node v23, and using this version of Node is recommended.
 
 ```bash
-npm install <not-released-yet>
+git clone https://github.com/stealthstudios/stealth-sdk.git
+cd stealth-sdk
+npm install
 ```
 
 ### Environment Variables
 
-When using this application, you need to set the following environment variables:
+When using this application, you need to set the following environment variables in an `.env` file (An example is provided [here](./.env.example)):
 
 - `AGENT_PROVIDER`: The provider to use for the agent. This should be set to `eliza` or left empty.
 - `PROVIDER`: `anthropic` (Claude 3.5), `deepseekv3` or `openai` (GPT4).
@@ -73,6 +75,15 @@ If you are using Eliza (`AGENT_PROVIDER=eliza`), have a look at the [Eliza docum
 
 ## Running the application
 
+### Setting up the database
+
+We use [Prisma](https://www.prisma.io/) to manage the database. To start the database and set it up, run the following commands (assuming all environment variables are set and [Docker](https://www.docker.com/) is installed):
+
+```bash
+docker compose up -d
+npx prisma db push
+```
+
 ### Development
 
 ```bash
@@ -83,21 +94,17 @@ This starts a development server. The server will automatically reload if you ma
 
 ### Production
 
+To start the server in production, run the following command:
+
 ```bash
 npm run deploy
 ```
 
-### Docker
-
-Launch with `docker.sh`. This will remove existing containers, build the image and run the container, injecting necessary environment variables. Launching the Docker container through other methods is not recommended.
-
-```bash
-./docker.sh
-```
+A solution like [PM2](https://pm2.keymetrics.io/) is recommended for running the server in production.
 
 ## Endpoint Documentation
 
-By defining an OpenAPI scheme for every endpoint, a documentation page is generated automatically at `/reference`. This page is generated using Scalar.
+By defining an OpenAPI scheme for every endpoint, a documentation page is generated automatically at `/reference` when the server is running. This page is generated using Scalar.
 
 ## Contributing
 

@@ -1,6 +1,6 @@
 {
     "name": "stealthsdk-backend",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "",
     "main": "src/index.js",
     "type": "module",
@@ -14,8 +14,13 @@
         "dev": "nodemon index.js --watch src",
         "lint": "eslint \"./src/**/*.js\" --config ./eslint.config.mjs",
         "format": "prettier --write \"./src/**/*.js\"",
-        "ci:format": "prettier --check \"./src/**/*.js\""
+        "ci:format": "prettier --check \"./src/**/*.js\"",
+        "postinstall": "npx prisma generate"
     },
+    "files": [
+        "src",
+        "prisma/schema.prisma"
+    ],
     "author": "",
     "license": "ISC",
     "devDependencies": {

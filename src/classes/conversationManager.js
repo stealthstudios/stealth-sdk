@@ -86,10 +86,20 @@ class ConversationManager {
      * @param { string } persistenceToken - The persistence token
      * @returns { Promise<Conversation | null> } The conversation instance or null if not found
      */
-    async getConversationByPersistenceToken(persistenceToken) {
+    async getConversationByPersistenceToken(persistenceToken, personalityHash) {
         const conversation = await prismaClient.conversation.findFirst({
             where: { persistenceToken },
+            include: {
+                personality: true,
+            },
         });
+
+        if (conversation.personality.hash !== personalityHash) {
+            await prismaClient.conversation.delete({
+                where: { id: conversation.id },
+            });
+            return null;
+        }
 
         return conversation ? new Conversation(conversation) : null;
     }

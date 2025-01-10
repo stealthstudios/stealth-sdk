@@ -25,6 +25,14 @@ local STATUS_TEXTS = {
 		text = "✅ Action ran!",
 		color = Color3.fromHex("#2e8b49"),
 	},
+	actionSuccess = {
+		text = "✅ Action ran!",
+		color = Color3.fromHex("#2e8b49"),
+	},
+	actionFailure = {
+		text = "❌ Action failed!",
+		color = Color3.fromHex("#ef4444"),
+	},
 }
 
 local DEFAULT_FONT =

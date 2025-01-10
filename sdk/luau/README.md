@@ -166,10 +166,6 @@ An example character is provided below:
     -- Events are all optional. Default behaviour can be found in src/server/defaultCharacterConfig.luau
     -- Called events all receive the character as the first argument.
     events = {
-        -- Called when a player enters the radius of the character.
-        onRadiusEnter = function(self, player)
-            self:getConversationForPlayer(player, true)
-        end,
         -- Called when a player leaves the radius of the character.
         onRadiusLeft = function(_, player, conversation)
             if conversation then
@@ -212,8 +208,31 @@ An example character is provided below:
 				end
 
                 -- Execute the functions.
-				self:executeFunctions(player, reply.calls)
-				model:completeChat(chatId)
+                local actionResponses = self:executeFunctions(player, reply.calls)
+                -- Have we provided feedback to the player yet?
+                local feedbackProvided = false
+
+                -- We've received action responses! Let's provide feedback to the player.
+				for _, actionResponse in actionResponses do
+                    -- This behaviour is completely customizable.
+                    -- In this case, we let the player know if an action failed.
+					if not actionResponse.success then
+                        feedbackProvided = true
+                        -- Will show the action's message in the chat bubble, colored in the appropriate color.
+						model:provideActionFeedback(chatId, actionResponse)
+                        -- We only have one chat bubble available, so let's break out of the loop.
+						break
+					end
+				end
+
+                if not feedbackProvided then
+                    -- We haven't received any feedback, so let's provide a default message to let the player know that the action was at least executed.
+                    model:provideActionFeedback(chatId, {
+                        success = true,
+                        message = "Action ran!",
+                    })
+                end
+
 				return
 			end
 
