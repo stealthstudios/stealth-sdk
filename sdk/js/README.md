@@ -9,14 +9,14 @@
 ## Table of Contents
 
 - [stealth-sdk-js](#stealth-sdk-js)
-    - [Table of Contents](#table-of-contents)
-    - [Usage](#usage)
-    - [Roblox Open Cloud](#roblox-open-cloud)
-    - [Functions](#functions)
+  - [Table of Contents](#table-of-contents)
+  - [Usage](#usage)
+  - [Roblox Open Cloud](#roblox-open-cloud)
+  - [Functions](#functions)
 
 ## Usage
 
-Installation can be done through NPM:
+Installation can be done through any preferred package manager (we recommend [pnpm](https://pnpm.io/installation)):
 
 ```bash
 pnpm install stealthstudios/stealthsdk-js

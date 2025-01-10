@@ -48,6 +48,8 @@ Developers can then use the SDKs to interact with this backend, and build their 
 
 This application was built with Node v23, and using this version of Node is recommended.
 
+You can use any preferred package manager to install the dependencies. We recommend using [pnpm](https://pnpm.io/installation).
+
 ```bash
 git clone https://github.com/stealthstudios/stealth-sdk.git
 cd stealth-sdk
